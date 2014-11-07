@@ -90,6 +90,9 @@ $config = [
             'cost'                   => 12,
             'admins'                 => ['akosk']
         ],
+        'attendance' => [
+            'class' => 'app\modules\attendance\Module',
+        ],
     ],
     'params'     => $params,
 ];

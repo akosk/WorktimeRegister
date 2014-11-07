@@ -35,19 +35,62 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items'   => [
-            ['label' => 'Home', 'url' => ['/site/index']],
             [
-                'label'   => 'Felhasználók',
-                'url'     => ['//user/admin/index'],
-                'visible' => !Yii::$app->user->isGuest],
+                'label'       => '<i class="glyphicon glyphicon-home"></i>',
+                'encode' => false,
+                'url'         => ['/site/index'],
+            ],
             [
-                'label'   => 'Profil',
-                'url'     => ['//user/profile/index'],
-                'visible' => !Yii::$app->user->isGuest],
+                'label'   => 'Felhasználókezelés',
+                'visible' => !Yii::$app->user->isGuest,
+                'items'   => [
+                    [
+                        'label'   => 'Felhasználókezelés',
+                        'url'     => ['//user/admin/index'],
+                        'visible' => !Yii::$app->user->isGuest,
+                    ],
+                    [
+                        'label'   => 'Saját profil',
+                        'url'     => ['//user/profile/index'],
+                        'visible' => !Yii::$app->user->isGuest
+                    ],
+                    [
+                        'label'   => 'Saját profil szerkesztése',
+                        'url'     => ['//user/settings/profile'],
+                        'visible' => !Yii::$app->user->isGuest
+                    ],
+
+                ]
+            ],
+
             [
-                'label'   => 'Beállítások',
-                'url'     => ['//user/settings/profile'],
-                'visible' => !Yii::$app->user->isGuest],
+                'label'   => 'Jelenlét',
+                'visible' => !Yii::$app->user->isGuest,
+                'items'   => [
+                    [
+                        'label'   => 'Jelenléti ív',
+                        'url'     => ['//attendance/default/index'],
+                        'visible' => !Yii::$app->user->isGuest
+                    ],
+                    [
+                        'label'   => 'Munkaszüneti napok',
+                        'url'     => ['//attendance/default/holidays'],
+                        'visible' => !Yii::$app->user->isGuest
+                    ],
+
+                    [
+                        'label'   => 'Szervezeti egységek',
+                        'url'     => ['//attendance/default/unions'],
+                        'visible' => !Yii::$app->user->isGuest
+                    ],
+                    [
+                        'label'   => 'Saját beállítások',
+                        'url'     => ['//attendance/default/profile'],
+                        'visible' => !Yii::$app->user->isGuest
+                    ],
+
+                ]
+            ],
 
             Yii::$app->user->isGuest ?
                 ['label' => 'Bejelentkezés', 'url' => ['//user/security/login']] :
