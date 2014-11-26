@@ -5,31 +5,31 @@ $params = require(__DIR__ . '/params.php');
 $config = [
     'id'         => 'basic',
     'basePath'   => dirname(__DIR__),
-    'language' => 'hu-HU',
+    'language'   => 'hu-HU',
     'bootstrap'  => ['log'],
     'components' => [
-        'request'      => [
+        'request'              => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'QLfjhC6KntLLjQvHsF-3yLs8RMYnay3Z',
         ],
-        'cache'        => [
+        'cache'                => [
             'class' => 'yii\caching\FileCache',
         ],
-        'user'         => [
+        'user'                 => [
             'identityClass'   => 'app\models\User',
             'enableAutoLogin' => true,
         ],
-        'errorHandler' => [
+        'errorHandler'         => [
             'errorAction' => 'site/error',
         ],
-        'mailer'       => [
+        'mailer'               => [
             'class'            => 'yii\swiftmailer\Mailer',
             // send all mails to a file by default. You have to set
             // 'useFileTransport' to false and configure a transport
             // for the mailer to send real emails.
             'useFileTransport' => true,
         ],
-        'log'          => [
+        'log'                  => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets'    => [
                 [
@@ -38,51 +38,67 @@ $config = [
                 ],
             ],
         ],
-        'authClientCollection' => [
-            'class' => 'yii\authclient\Collection',
-            'clients' => [
-                'google' => [
-                    'class' => 'yii\authclient\clients\GoogleOpenId'
-                ],
-                'facebook' => [
-                    'class' => 'yii\authclient\clients\Facebook',
-                    'clientId' => '587558988036691',
-                    'clientSecret' => '8c28f4586c3ea6734f8be844c4bdfcf6',
-                ],
-            ],
-        ],
-        'authManager'  => [
+//        'authClientCollection' => [
+//            'class'   => 'yii\authclient\Collection',
+//            'clients' => [
+//                'google'   => [
+//                    'class' => 'yii\authclient\clients\GoogleOpenId'
+//                ],
+//                'facebook' => [
+//                    'class'        => 'yii\authclient\clients\Facebook',
+//                    'clientId'     => '587558988036691',
+//                    'clientSecret' => '8c28f4586c3ea6734f8be844c4bdfcf6',
+//                ],
+//            ],
+//        ],
+        'authManager'          => [
             'class'        => 'yii\rbac\DbManager',
             'defaultRoles' => ['guest'],
         ],
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'enableStrictParsing' => true,
-            'rules' => [
+        'urlManager'           => [
+            'enablePrettyUrl'     => true,
+            'showScriptName'      => false,
+            'enableStrictParsing' => false,
+            'rules'               => [
                 '<module:\w+>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',
-                '<module:\w+>/<controller:\w+>/<action:\w+>' => '<module>/<controller>/<action>',
-                '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
-                '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
-                '' => '/site/index',
+                '<module:\w+>/<controller:\w+>/<action:\w+>'          => '<module>/<controller>/<action>',
+                '<controller:\w+>/<action:\w+>/<id:\d+>'              => '<controller>/<action>',
+                '<controller:\w+>/<action:\w+>'                       => '<controller>/<action>',
+                ''                                                    => '/site/index',
             ],
         ],
-        'view' => [
+        'view'                 => [
             'theme' => [
                 'pathMap' => [
                     '@dektrium/user/views' => '@app/views/user'
                 ],
             ],
         ],
-        'db'           => require(__DIR__ . '/db.php'),
+        'assetManager' => [
+            'bundles' => [
+                '@app\components\assets\FontawesomeAsset' => [
+                    'sourcePath' => '',
+                    'js' => [
+                        '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js',
+                    ]
+                ],
+            ],
+        ],
+        'db'                   => require(__DIR__ . '/db.php'),
     ],
     'modules'    => [
-        'user' => [
+        'user'       => [
             'class'                  => 'dektrium\user\Module',
-            'components' => [
+            'components'             => [
                 'manager' => [
                     'userClass' => 'app\models\User',
+                    'profileClass' => 'app\models\Profile',
+                    'loginFormClass' => 'app\models\LoginForm',
+                    'loginFormClass' => 'app\models\LoginForm',
                 ],
+            ],
+            'controllerMap' => [
+                'security' => 'app\controllers\SecurityController'
             ],
             'enableUnconfirmedLogin' => true,
             'enableConfirmation'     => false,

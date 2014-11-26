@@ -26,20 +26,20 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'Yii2-Base',
+        'brandLabel' => 'Munkaidő nyilvántartó',
         'brandUrl'   => Yii::$app->homeUrl,
         'options'    => [
-            'class' => 'navbar-inverse navbar-fixed-top',
+            'class' => 'navbar-inverse  navbar-fixed-top',
         ],
     ]);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items'   => [
-            [
-                'label'       => '<i class="glyphicon glyphicon-home"></i>',
-                'encode' => false,
-                'url'         => ['/site/index'],
-            ],
+//            [
+//                'label'       => '<i class="glyphicon glyphicon-home"></i>',
+//                'encode' => false,
+//                'url'         => ['/site/index'],
+//            ],
             [
                 'label'   => 'Felhasználókezelés',
                 'visible' => !Yii::$app->user->isGuest,
@@ -59,6 +59,11 @@ AppAsset::register($this);
                         'url'     => ['//user/settings/profile'],
                         'visible' => !Yii::$app->user->isGuest
                     ],
+                    [
+                        'label'   => 'Adószám',
+                        'url'     => ['//user/security/taxnumber'],
+                        'visible' => !Yii::$app->user->isGuest
+                    ],
 
                 ]
             ],
@@ -72,20 +77,15 @@ AppAsset::register($this);
                         'url'     => ['//attendance/default/index'],
                         'visible' => !Yii::$app->user->isGuest
                     ],
-                    [
-                        'label'   => 'Munkaszüneti napok',
-                        'url'     => ['//attendance/default/holidays'],
-                        'visible' => !Yii::$app->user->isGuest
-                    ],
 
                     [
                         'label'   => 'Szervezeti egységek',
-                        'url'     => ['//attendance/default/unions'],
+//                        'url'     => ['//attendance/default/unions'],
                         'visible' => !Yii::$app->user->isGuest
                     ],
                     [
                         'label'   => 'Saját beállítások',
-                        'url'     => ['//attendance/default/profile'],
+//                        'url'     => ['//attendance/default/profile'],
                         'visible' => !Yii::$app->user->isGuest
                     ],
 
