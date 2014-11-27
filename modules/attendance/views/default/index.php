@@ -48,11 +48,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div>
                             <tr ng-class="getRowBg(a)" ng-repeat="a in ourData.attendances" focus-time>
                                 <td style="max-width:50px">
-    <span
-        ng-class="helpers.isCurrentDay(a.date) ? 'bold':''">{{a.date | justDay}}</span>
+                                    <span
+                                        ng-class="helpers.isCurrentDay(a.date) ? 'bold':''">{{a.date | justDay}}</span>
                                 </td>
 
-                                <td ng-show="!isUserOnFreeDay(a)">
+                                <td ng-show="a.userWorkDay">
                                     <input type="text"
                                            style="max-width:120px"
                                            ng-focus="setFocusedItem(a)"
@@ -61,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                            placeholder="Érkezés ideje"
                                            class="form-control"
                                            ng-class="helpers.isCurrentDay(a.date) && a.from===null?'focused':''"></td>
-                                <td ng-show="!isUserOnFreeDay(a)">
+                                <td ng-show="a.userWorkDay">
                                     <input type="text" class="form-control" style="max-width:120px"
                                            ng-model="a.to" empty-to-null
                                            mask="29:59"
@@ -69,50 +69,54 @@ $this->params['breadcrumbs'][] = $this->title;
                                            ng-class="helpers.isCurrentDay(a.date) && a.from!==null && a
         .to===null?'focused':''"></td>
 
-                                <td ng-show="isUserOnFreeDay(a)" colspan="2"><span
-                                        class="text-danger">{{a.absence.label}}</span></td>
+                                <td ng-show="!a.userWorkDay" colspan="2"><span
+                                        class="text-danger">{{offDayText(a)}}</span></td>
 
                                 <td style="min-width:40px">
-                                    <div ng-show="focusedItem==a && isSave" class="text-center"><i class="fa fa-cog
-    fa-spin fa-2x
-    "></i></div>
+                                    <div ng-show="focusedItem==a && isSave" class="text-center">
+                                        <i class="fa fa-cog fa-spin fa-2x"></i>
+                                    </div>
                                 </td>
 
                                 <td>
-                                    <div class="btn-group">
+                                    <div class="btn-group" ng-show="a.userWorkDay">
                                         <button type="button" class="btn btn-success btn-xs dropdown-toggle"
                                                 data-toggle="dropdown" aria-expanded="false">
                                             <i class="fa fa-calendar fa-2x"></i>
                                         </button>
                                         <ul class="dropdown-menu" role="menu">
-                                            <li ng-repeat="absenceType in ourData.absenceTypes"><a href="#">{{absenceType.label}}</a>
+                                            <li ng-repeat="absenceType in ourData.absenceTypes">
+                                                <a  ng-click="setAbsence(a,absenceType)">
+                                                 {{absenceType.label}}
+                                                </a>
                                             </li>
 
                                         </ul>
                                     </div>
-    <span ng-show="isWorkDay(a.date)"
-          ng-click=""
-          class="btn btn-success btn-xs"
-          style="font-size:17px"
-          href="#" title="Ünnepnap">
-    <strong>Ü</strong>
-    </span>
-    <span ng-show="!isWorkDay(a.date)"
-          ng-click=""
-          class="btn btn-success btn-xs"
-          style="font-size:17px"
-          href="#" title="Munkanap">
+                                    <span ng-show="a.workDay && helpers.isAfterCurrentMonth(a.date)"
+                                          ng-click="setRedLetterDay(a)"
+                                          class="btn btn-success btn-xs"
+                                          style="font-size:17px"
+                                          href="#" title="Ünnepnap">
+                                            <strong>Ü</strong>
+                                    </span>
+                                    <span ng-show="!a.workDay && helpers.isAfterCurrentMonth(a.date)"
+                                          ng-click="setWorkingDay(a)"
+                                          class="btn btn-success btn-xs"
+                                          style="font-size:17px"
+                                          href="#" title="Munkanap">
 
-    <strong>M</strong>
-    </span>
+                                        <strong>M</strong>
+                                    </span>
 
 
-    <span ng-show="!isUserOnFreeDay(a) && ((a.from!==null) || (a.to!==null))"
-          ng-click="clearTimes(a)"
-          class="btn btn-danger btn-xs"
-          href="#" title="Töröl">
-    <i class="fa fa-remove fa-2x"></i>
-    </span>
+                                    <span ng-show="(!isUserOnFreeDay(a) && ((a.from!==null) || (a.to!==null))) ||
+                                    a.userAbsence!==undefined"
+                                          ng-click="clearTimes(a)"
+                                          class="btn btn-danger btn-xs"
+                                          href="#" title="Töröl">
+                                            <i class="fa fa-remove fa-2x"></i>
+                                    </span>
 
                                 </td>
                             </tr>
