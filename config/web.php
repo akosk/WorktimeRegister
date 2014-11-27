@@ -94,17 +94,17 @@ $config = [
                     'userClass' => 'app\models\User',
                     'profileClass' => 'app\models\Profile',
                     'loginFormClass' => 'app\models\LoginForm',
-                    'loginFormClass' => 'app\models\LoginForm',
                 ],
             ],
             'controllerMap' => [
-                'security' => 'app\controllers\SecurityController'
+                'security' => 'app\controllers\SecurityController',
+                'admin' => 'app\controllers\AdminController'
             ],
             'enableUnconfirmedLogin' => true,
             'enableConfirmation'     => false,
             'confirmWithin'          => 21600,
             'cost'                   => 12,
-            'admins'                 => ['akosk']
+            'admins'                 => ['emr1']
         ],
         'attendance' => [
             'class' => 'app\modules\attendance\Module',

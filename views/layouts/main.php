@@ -47,7 +47,7 @@ AppAsset::register($this);
                     [
                         'label'   => 'Felhasználókezelés',
                         'url'     => ['//user/admin/index'],
-                        'visible' => !Yii::$app->user->isGuest,
+                        'visible' => Yii::$app->user->can('admin'),
                     ],
                     [
                         'label'   => 'Saját profil',
@@ -81,7 +81,7 @@ AppAsset::register($this);
                     [
                         'label'   => 'Szervezeti egységek',
 //                        'url'     => ['//attendance/default/unions'],
-                        'visible' => !Yii::$app->user->isGuest
+                        'visible' => Yii::$app->user->can('admin'),
                     ],
                     [
                         'label'   => 'Saját beállítások',

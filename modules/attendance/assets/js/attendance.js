@@ -3,6 +3,7 @@
  */
 
 /*jshint loopfunc: true */
+/*global  isAdmin: true */
 
 var attendanceModule;
 
@@ -51,6 +52,7 @@ var attendanceModule;
 
          $scope.isBusy = true;
          $scope.isSave = false;
+         $scope.isAdmin = isAdmin;
          $scope.helpers = helpers;
 
 

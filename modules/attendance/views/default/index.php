@@ -86,21 +86,21 @@ $this->params['breadcrumbs'][] = $this->title;
                                         </button>
                                         <ul class="dropdown-menu" role="menu">
                                             <li ng-repeat="absenceType in ourData.absenceTypes">
-                                                <a  ng-click="setAbsence(a,absenceType)">
-                                                 {{absenceType.label}}
+                                                <a ng-click="setAbsence(a,absenceType)">
+                                                    {{absenceType.label}}
                                                 </a>
                                             </li>
 
                                         </ul>
                                     </div>
-                                    <span ng-show="a.workDay && helpers.isAfterCurrentMonth(a.date)"
+                                    <span ng-show="isAdmin && a.workDay && helpers.isAfterCurrentMonth(a.date)"
                                           ng-click="setRedLetterDay(a)"
                                           class="btn btn-success btn-xs"
                                           style="font-size:17px"
                                           href="#" title="Ünnepnap">
                                             <strong>Ü</strong>
                                     </span>
-                                    <span ng-show="!a.workDay && helpers.isAfterCurrentMonth(a.date)"
+                                    <span ng-show="isAdmin && !a.workDay && helpers.isAfterCurrentMonth(a.date)"
                                           ng-click="setWorkingDay(a)"
                                           class="btn btn-success btn-xs"
                                           style="font-size:17px"
@@ -189,5 +189,6 @@ $this->params['breadcrumbs'][] = $this->title;
 </script>
 
 <script>
-    var BASE_URL = "<?=\Yii::$app->homeUrl ?>"
+    var BASE_URL = "<?=\Yii::$app->homeUrl ?>";
+    var isAdmin = <?=\Yii::$app->user->can('admin') ? 'true':'false' ?>;
 </script>
