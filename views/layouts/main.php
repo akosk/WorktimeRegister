@@ -112,9 +112,9 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+        <p class="pull-left"><a href="http://iszk.uni-miskolc.hu/">Copyright &copy; <?= date('Y') ?> Miskolci Egyetem Informatikai Szolgáltató
+                Központ</a></p>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
 </footer>
 
