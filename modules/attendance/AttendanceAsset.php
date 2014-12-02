@@ -23,7 +23,7 @@ class AttendanceAsset extends AssetBundle
         'app\components\assetbundles\FontawesomeAsset',
         'app\components\assetbundles\AngularAsset',
         'app\components\assetbundles\UnderscoreAsset',
-        'app\components\assetbundles\AngularNgMaskAsset',
+//        'app\components\assetbundles\AngularNgMaskAsset',
         'app\components\assetbundles\AngularNgRouteAsset'
     ];
 }

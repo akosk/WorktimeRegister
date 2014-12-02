@@ -15,7 +15,7 @@ var attendanceModule;
 // MODULE
 //
 
-   attendanceModule = angular.module("attendance", ['ngMask', 'ngRoute']);
+   attendanceModule = angular.module("attendance", ['ngRoute']);
 
 //
 // CONFIG

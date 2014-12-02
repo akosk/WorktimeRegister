@@ -57,14 +57,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                            style="max-width:120px"
                                            ng-focus="setFocusedItem(a)"
                                            ng-model="a.from" empty-to-null
-                                           mask="29:59"
+
                                            placeholder="Érkezés ideje"
                                            class="form-control"
                                            ng-class="helpers.isCurrentDay(a.date) && a.from===null?'focused':''"></td>
                                 <td ng-show="a.userWorkDay">
                                     <input type="text" class="form-control" style="max-width:120px"
                                            ng-model="a.to" empty-to-null
-                                           mask="29:59"
+
                                            placeholder="Távozás ideje"
                                            ng-class="helpers.isCurrentDay(a.date) && a.from!==null && a
         .to===null?'focused':''"></td>
