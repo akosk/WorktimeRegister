@@ -1,6 +1,6 @@
 <?php
 
-namespace app\moduls\attendance\models;
+namespace app\modules\attendance\models;
 
 use Yii;
 

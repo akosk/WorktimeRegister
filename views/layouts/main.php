@@ -79,6 +79,18 @@ AppAsset::register($this);
                     ],
 
                     [
+                        'label'   => 'Jelenlétek és zárolás',
+                        'url'     => ['//attendance/default/admin'],
+                        'visible' => !Yii::$app->user->isGuest
+                    ],
+
+                    [
+                        'label'   => 'Dolgozók adatainak importálása',
+                        'url'     => ['//attendance/default/import'],
+                        'visible' => !Yii::$app->user->isGuest
+                    ],
+
+                    [
                         'label'   => 'Szervezeti egységek',
 //                        'url'     => ['//attendance/default/unions'],
                         'visible' => Yii::$app->user->can('admin'),
@@ -122,3 +134,5 @@ AppAsset::register($this);
 </body>
 </html>
 <?php $this->endPage() ?>
+
+
