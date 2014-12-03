@@ -189,6 +189,6 @@ $this->params['breadcrumbs'][] = $this->title;
 </script>
 
 <script>
-    var BASE_URL = "<?=\Yii::$app->homeUrl ?>";
+    var BASE_URL = "<?=\Yii::$app->homeUrl ?>/";
     var isAdmin = <?=\Yii::$app->user->can('admin') ? 'true':'false' ?>;
 </script>

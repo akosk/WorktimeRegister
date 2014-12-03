@@ -57,7 +57,7 @@ $config = [
         ],
         'urlManager'           => [
             'enablePrettyUrl'     => true,
-            'showScriptName'      => false,
+            'showScriptName'      => true,
             'enableStrictParsing' => false,
             'rules'               => [
                 '<module:\w+>/<controller:\w+>/<action:\w+>/<id:\d+>' => '<module>/<controller>/<action>',
