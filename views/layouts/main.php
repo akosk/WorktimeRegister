@@ -95,11 +95,6 @@ AppAsset::register($this);
 //                        'url'     => ['//attendance/default/unions'],
                         'visible' => Yii::$app->user->can('admin'),
                     ],
-                    [
-                        'label'   => 'Saját beállítások',
-//                        'url'     => ['//attendance/default/profile'],
-                        'visible' => !Yii::$app->user->isGuest
-                    ],
 
                 ]
             ],
