@@ -26,12 +26,12 @@ class SecurityController extends BaseSecurityController
                 'rules' => [
                     [
                         'allow'   => true,
-                        'actions' => ['login', 'auth'],
+                        'actions' => ['login','auth'],
                         'roles'   => ['?']
                     ],
                     [
                         'allow'   => true,
-                        'actions' => ['logout', 'taxnumber'],
+                        'actions' => ['login','logout', 'taxnumber'],
                         'roles'   => ['@']
                     ],
                 ]
@@ -48,6 +48,10 @@ class SecurityController extends BaseSecurityController
 
     public function actionLogin()
     {
+        if (!Yii::$app->user->isGuest) {
+            return Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/index'));
+        }
+
         $model = $this->module->manager->createLoginForm();
 
         if ($model->load(\Yii::$app->getRequest()->post()) && $model->login()) {
