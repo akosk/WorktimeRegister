@@ -14,6 +14,12 @@ $this->title = Yii::t('attendance', 'Jelenlétek és zárolások');
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
+
+<div class="alert alert-warning">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <strong>Fejlesztés alatt!</strong> A menüpont jelenleg fejlesztés alatt van, elnézést az esetleges kellemetlenségekért.
+</div>
+
 <div class="row">
     <div class="col-md-8">
         <h2><?= $currentUser->profile->department->name ?></h2>

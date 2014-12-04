@@ -35,7 +35,7 @@ class DefaultController extends Controller
                 'rules' => [
                     [
                         'actions' => ['index', 'get-attendances', 'save-attendances', 'set-red-letter-day',
-                            'set-absence', 'remove-absence', 'admin'],
+                            'set-absence', 'remove-absence', 'admin', 'import'],
                         'allow'   => true,
                         'roles'   => ['@'],
                     ],
@@ -339,6 +339,13 @@ class DefaultController extends Controller
 
         $isWeekday = $date->format('N') < 6;
         return $isWeekday;
+
+    }
+
+    public function actionImport()
+    {
+        return $this->render('import', [
+        ]);
 
     }
 

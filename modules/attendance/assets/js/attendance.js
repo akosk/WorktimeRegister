@@ -57,23 +57,34 @@ var attendanceModule;
 
 
          $scope.$watch('ourData', function (newVal, oldVal) {
-            if (oldVal.attendances.length !== 0) {
-               $scope.isSave = true;
-               dataService.saveAttendances().then(
-                  function () {
-                     console.log("Attendances saved.");
-                  },
-                  function () {
-                     //error
-                     console.log("Error during saving attendances!");
-                  }
-               ).then(function () {
-                     $scope.isSave = false;
-                  });
+            if (oldVal.attendances.length !== 0 && $scope.isAttendancesValid()) {
+               var firstChanged = _.find(newVal.attendances, function (item, idx) {
+                  return item.from !== oldVal.attendances[idx].from || item.to !== oldVal.attendances[idx].to;
+               });
+               if (firstChanged !== undefined) {
+                  $scope.oldFocusedItem= _.clone(firstChanged);
+                  $scope.isSave = true;
+                  dataService.saveAttendances().then(
+                     function () {
+                        console.log("Attendances saved.");
+                     },
+                     function () {
+                        //error
+                        console.log("Error during saving attendances!");
+                     }
+                  ).then(function () {
+                        $scope.isSave = false;
+                     });
 
+               }
             }
-
          }, true);
+
+         $scope.isAttendancesValid = function () {
+            return _.every(dataService.attendances, function (item) {
+               return $scope.isValid(item);
+            });
+         };
 
          $scope.getAttendances = function () {
             dataService.getAttendances($scope.year, $scope.month)
@@ -91,8 +102,27 @@ var attendanceModule;
 
          };
 
+         $scope.isValidTime = function (time) {
+            if (time === null || time === undefined) {
+               return true;
+            }
+            var regex = /([01]\d|2[0-3]):([0-5]\d)/;
+            return regex.test(time) && time.length===5;
+         };
+
+         $scope.isValid = function (item) {
+            if (item.from === null && item.to === null) {
+               return true;
+            }
+            return $scope.isValidTime(item.from) && $scope.isValidTime(item.to);
+
+         };
 
          $scope.getRowBg = function (item) {
+            if (!$scope.isValid(item)) {
+               return 'alert alert-danger';
+            }
+
             if (helpers.isCurrentDay(item.date)) {
                return "info";
             }
@@ -126,6 +156,17 @@ var attendanceModule;
 
          $scope.setFocusedItem = function (item) {
             $scope.focusedItem = item;
+            if (item !== undefined && item !== null) {
+               $scope.oldFocusedItem = _.clone(item);
+            }
+         };
+
+         $scope.unsetFocusedItem = function (item) {
+            if ($scope.oldFocusedItem !== undefined && $scope.oldFocusedItem !== null && !$scope.isValid(item)) {
+               item.from = $scope.oldFocusedItem.from;
+               item.to = $scope.oldFocusedItem.to;
+            }
+            $scope.focusedItem = null;
          };
 
          $scope.getPreviousMonthUrl = function () {

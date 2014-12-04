@@ -53,20 +53,32 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         <td ng-show="a.userWorkDay">
                             <input type="text"
-                                   style="max-width:120px"
-                                   ng-focus="setFocusedItem(a)"
-                                   ng-model="a.from" empty-to-null
-
-                                   placeholder="Érkezés ideje"
                                    class="form-control"
-                                   ng-class="helpers.isCurrentDay(a.date) && a.from===null?'focused':''"></td>
+                                   style="max-width:120px"
+                                   ng-model="a.from"
+                                   empty-to-null
+                                   ak-time-mask
+                                   ng-focus="setFocusedItem(a)"
+                                   ng-blur="unsetFocusedItem(a)"
+                                   placeholder="Érkezés ideje"
+                                   ng-class="helpers.isCurrentDay(a.date)
+                                             && a.from===null
+                                             ? 'focused' : '' ">
+                        </td>
                         <td ng-show="a.userWorkDay">
-                            <input type="text" class="form-control" style="max-width:120px"
+                            <input type="text"
+                                   class="form-control"
+                                   style="max-width:120px"
                                    ng-model="a.to" empty-to-null
-
+                                   ng-focus="setFocusedItem(a)"
+                                   ng-blur="unsetFocusedItem(a)"
                                    placeholder="Távozás ideje"
-                                   ng-class="helpers.isCurrentDay(a.date) && a.from!==null && a
-        .to===null?'focused':''"></td>
+                                   ng-class="helpers.isCurrentDay(a.date)
+                                             && a.from!==null
+                                             && a.to===null
+                                             ? 'focused' : ''">
+
+                        </td>
 
                         <td ng-show="!a.userWorkDay" colspan="2"><span
                                 class="text-danger">{{offDayText(a)}}</span></td>

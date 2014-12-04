@@ -87,7 +87,7 @@ AppAsset::register($this);
                     [
                         'label'   => 'Dolgozók adatainak importálása',
                         'url'     => ['//attendance/default/import'],
-                        'visible' => !Yii::$app->user->isGuest
+                        'visible' => Yii::$app->user->can('admin'),
                     ],
 
                     [
