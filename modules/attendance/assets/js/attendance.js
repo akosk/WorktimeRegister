@@ -56,12 +56,12 @@ var attendanceModule;
          $scope.helpers = helpers;
 
 
+
          $scope.$watch('ourData', function (newVal, oldVal) {
             if (oldVal.attendances.length !== 0 && $scope.isAttendancesValid()) {
                var firstChanged = _.find(newVal.attendances, function (item, idx) {
                   return item.from !== oldVal.attendances[idx].from || item.to !== oldVal.attendances[idx].to;
                });
-
                if (firstChanged !== undefined) {
                   $scope.oldFocusedItem= _.clone(firstChanged);
                   $scope.isSave = true;

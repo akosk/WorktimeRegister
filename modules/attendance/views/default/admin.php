@@ -7,6 +7,7 @@
 
 //use kartik\grid\GridView;
 
+use kartik\widgets\AlertBlock;
 use yii\grid\GridView;
 use yii\helpers\Url;
 
@@ -17,7 +18,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="alert alert-warning">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <strong>Fejlesztés alatt!</strong> A menüpont jelenleg fejlesztés alatt van, elnézést az esetleges kellemetlenségekért.
+    <strong>Fejlesztés alatt!</strong> A menüpont jelenleg fejlesztés alatt van, elnézést az esetleges
+    kellemetlenségekért.
 </div>
 
 <div class="row">
@@ -39,6 +41,12 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 <br/>
+<?php
+echo AlertBlock::widget([
+    'useSessionFlash' => true,
+    'type'            => AlertBlock::TYPE_ALERT
+]);
+?>
 
 <div class="row">
     <div class="col-md-12">
@@ -49,16 +57,35 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="panel-body">
 
                 <?php if ($hasIncompleteUser) { ?>
-                <div class="alert alert-danger" role="alert"><strong><i class="fa fa-exclamation-triangle"></i> A
-                        zárolás nem
-                        javasolt!</strong>
-                    Van olyan
-                    dolgozó aki még nem fejezte be a jelenléti ív kitöltését.
-                </div>
+                    <div class="alert alert-danger" role="alert"><strong><i class="fa fa-exclamation-triangle"></i>
+                            Figyelem!</strong>
+                        Van olyan
+                        dolgozó aki még nem fejezte be a jelenléti ív kitöltését.
+                    </div>
                 <?php } ?>
 
-                <button class="btn btn-danger">Jelenlétek zárolása</button>
-                <button class="btn btn-danger">Távollétek zárolása</button>
+
+                <?php if ($closeMonth->attendances_closed != 1) { ?>
+                    <a class="btn btn-danger"
+                       href="<?= Url::to(['/attendance/default/close',
+                           'year'   => $year,
+                           'month'  => $month,
+                           'target' => 'attendances'
+                       ]) ?>">Jelenlétek zárolása</a>
+                <?php } else { ?>
+                    <span class="btn disabled"><i class="fa fa-lock" role="alert"></i> A jelenlétek zárolva.</span>
+                <?php } ?>
+
+                <?php if ($closeMonth->absences_closed != 1) { ?>
+                    <a class="btn btn-danger"
+                       href="<?= Url::to(['/attendance/default/close',
+                           'year'   => $year,
+                           'month'  => $month,
+                           'target' => 'absences'
+                       ]) ?>">Távollétek zárolása</a>
+                <?php } else { ?>
+                    <span class="btn disabled"><i class="fa fa-lock" role="alert"></i> A távollétek zárolva.</span>
+                <?php } ?>
 
             </div>
         </div>
@@ -81,13 +108,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'username',
                 'profile.name',
                 [
-                    'label'=>'Kitöltötte',
-                    'attribute'=>'currentCompletions.id',
-                    'value'  => function ($data, $id, $index, $dataColumn) {
+                    'label'     => 'Kitöltötte',
+                    'attribute' => 'currentCompletions.id',
+                    'value'     => function ($data, $id, $index, $dataColumn) {
                         return count($data->currentCompletions) > 0 ? '<i class="glyphicon
                         glyphicon-ok"></i>' : '';
                     },
-                    'format' => 'raw',
+                    'format'    => 'raw',
                 ]
             ],
         ]);

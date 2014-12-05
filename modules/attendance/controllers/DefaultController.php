@@ -9,16 +9,20 @@ use app\models\User;
 use app\modules\attendance\AttendanceAsset;
 use app\modules\attendance\models\Attendance;
 use app\modules\attendance\models\Absence;
+use app\modules\attendance\models\CloseMonth;
 use app\modules\attendance\models\Completion;
 use app\modules\attendance\models\RedLetterDay;
 use app\modules\attendance\models\UserSearch;
 use DateInterval;
 use DateTime;
 use yii\base\Event;
+use yii\caching\ChainedDependency;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\helpers\Url;
 use yii\web\Controller;
+use yii\web\HttpException;
 
 
 class DefaultController extends Controller
@@ -35,7 +39,7 @@ class DefaultController extends Controller
                 'rules' => [
                     [
                         'actions' => ['index', 'get-attendances', 'save-attendances', 'set-red-letter-day',
-                            'set-absence', 'remove-absence', 'admin', 'import'],
+                            'set-absence', 'remove-absence', 'admin', 'import', 'close'],
                         'allow'   => true,
                         'roles'   => ['@'],
                     ],
@@ -103,6 +107,13 @@ class DefaultController extends Controller
         if (isset($data['attendances'])) {
             $data['attendances'] = array_values($data['attendances']);
         }
+
+        $currentUser = User::findOne(\Yii::$app->user->id);
+
+        $data['absences_closed'] = CloseMonth::isAbsencesClosed($year, $month, $currentUser->profile->department->id);
+        $data['attendances_closed'] = CloseMonth::isAttendancesClosed($year, $month,
+            $currentUser->profile->department->id);
+
         echo Json::encode($data);
     }
 
@@ -110,6 +121,26 @@ class DefaultController extends Controller
     {
         $json = file_get_contents("php://input");
         $attendances = Json::decode($json);
+
+        $currentUser = User::findOne(\Yii::$app->user->id);
+
+        if (count($attendances) > 0) {
+            $dtime = DateTime::createFromFormat("Y-m-d", $attendances[0]['date']);
+            $timestamp = $dtime->getTimestamp();
+
+            $year = date('Y', $timestamp);
+            $month = date('m', $timestamp);
+
+            if (CloseMonth::isAbsencesClosed(
+                $year,
+                $month,
+                $currentUser->profile->department->id
+            )
+            ) {
+                throw new HttpException(403, 'A hónap zárolva van.');
+            }
+
+        }
 
         foreach ($attendances AS $item) {
             if ($item['absence'] == Attendance::WORKDAY || !isset($item['absence'])) {
@@ -172,6 +203,18 @@ class DefaultController extends Controller
         $json = file_get_contents("php://input");
         $data = Json::decode($json);
         if (is_array($data)) {
+
+            $currentUser = User::findOne(\Yii::$app->user->id);
+
+            if (CloseMonth::isAbsencesClosed(
+                date("Y", strtotime($data['date'])),
+                date("n", strtotime($data['date'])),
+                $currentUser->profile->department->id
+            )
+            ) {
+                throw new HttpException(403, 'A hónap zárolva van.');
+            }
+
             $absence = Absence::find()->where('user_id=:user_id && date=:date', [
                 ':user_id' => \Yii::$app->user->id,
                 ':date'    => $data['date']])->one();
@@ -229,6 +272,15 @@ class DefaultController extends Controller
 
         $currentUser = User::findOne(\Yii::$app->user->id);
 
+        $closeMonth = CloseMonth::find()->where('year=:year AND month=:month AND department_id=:department_id',
+            [
+                ':year'          => $year,
+                ':month'         => $month,
+                ':department_id' => $currentUser->profile->department->id,
+            ])->one();
+        if (!$closeMonth) $closeMonth = new CloseMonth();
+
+
         $userSearch = new UserSearch();
         $userSearch->year = $year;
         $userSearch->month = $month;
@@ -245,6 +297,7 @@ class DefaultController extends Controller
 
         FontawesomeAsset::register($this->getView());
 
+
         return $this->render('admin', [
             'dataProvider'      => $dataProvider,
             'userSearch'        => $userSearch,
@@ -257,6 +310,7 @@ class DefaultController extends Controller
             'prevMonthsYear'    => $month == 1 ? $year - 1 : $year,
             'prevMonth'         => $month == 1 ? 12 : $month - 1,
             'hasIncompleteUser' => $hasIncompleteUser,
+            'closeMonth'        => $closeMonth,
         ]);
 
     }
@@ -348,5 +402,39 @@ class DefaultController extends Controller
         ]);
 
     }
+
+    public function actionClose($year, $month, $target)
+    {
+
+//        TODO: Authorization
+
+        $user = User::findOne(\Yii::$app->user->id);
+
+        $closeMonth = CloseMonth::find()->where('year=:year AND month=:month AND department_id=:department_id',
+            [
+                ':year'          => $year,
+                ':month'         => $month,
+                ':department_id' => $user->profile->department->id,
+            ])->one();
+        if (!$closeMonth) {
+            $closeMonth = new CloseMonth();
+            $closeMonth->year = $year;
+            $closeMonth->month = $month;
+            $closeMonth->department_id = $user->profile->department->id;
+        }
+
+        $target = strtolower($target) . '_closed';
+        $closeMonth->$target = 1;
+
+        if ($closeMonth->save()) {
+            \Yii::$app->getSession()->setFlash('success', '<strong>Zárolva!</strong> A zárolás sikeresen megtörtént.');
+        } else {
+            \Yii::$app->getSession()->setFlash('error', '<strong>Hiba!</strong> A zárolás sikertelen.');
+        }
+
+
+        return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
+    }
+
 
 }

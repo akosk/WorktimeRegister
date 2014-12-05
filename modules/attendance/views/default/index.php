@@ -61,6 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                    ng-focus="setFocusedItem(a)"
                                    ng-blur="unsetFocusedItem(a)"
                                    placeholder="Érkezés ideje"
+                                   ng-disabled="ourData.isAttendancesClosed()"
                                    ng-class="helpers.isCurrentDay(a.date)
                                              && a.from===null
                                              ? 'focused' : '' ">
@@ -73,6 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                    ng-focus="setFocusedItem(a)"
                                    ng-blur="unsetFocusedItem(a)"
                                    placeholder="Távozás ideje"
+                                   ng-disabled="ourData.isAttendancesClosed()"
                                    ng-class="helpers.isCurrentDay(a.date)
                                              && a.from!==null
                                              && a.to===null
@@ -91,7 +93,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         <td>
                             <div class="btn-group" ng-show="a.userWorkDay">
-                                <button type="button" class="btn btn-success btn-xs dropdown-toggle"
+                                <button ng-show="!ourData.isAbsencesClosed()" type="button" class="btn
+                                btn-success btn-xs dropdown-toggle"
                                         data-toggle="dropdown" aria-expanded="false">
                                     <i class="fa fa-calendar fa-2x"></i>
                                 </button>
@@ -121,8 +124,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </span>
 
 
-                                    <span ng-show="(!isUserOnFreeDay(a) && ((a.from!==null) || (a.to!==null))) ||
-                                    a.userAbsence!==undefined"
+                                    <span ng-show="((!isUserOnFreeDay(a) && ((a.from!==null) || (a.to!==null))) ||
+                                    a.userAbsence!==undefined) && !ourData.isAttendancesClosed()"
                                           ng-click="clearTimes(a)"
                                           class="btn btn-danger btn-xs"
                                           href="#" title="Töröl">

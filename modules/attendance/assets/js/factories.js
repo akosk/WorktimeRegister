@@ -119,6 +119,8 @@
 
    attendanceModule.factory('dataService', function ($http, $q, helpers) {
       var _attendances = [];
+      var _attendances_closed = false;
+      var _absences_closed = false;
 
       var _absenceTypes = [
          {id: '1', code: '25004', label: 'TERHESSÉGI GYERMEKÁGYI SEGÉLY'},
@@ -164,6 +166,9 @@
          })
             .then(function (result) {
                var _temp = result.data.attendances === undefined ? [] : result.data.attendances;
+
+               _attendances_closed = result.data.attendances_closed;
+               _absences_closed = result.data.absences_closed;
 
                _temp = helpers.completeEmptyDays(_temp, year, month);
 
@@ -260,7 +265,7 @@
          var deferred = $q.defer();
 
          var d = {
-            date: date,
+            date: date
          };
 
          $http({
@@ -277,15 +282,25 @@
 
       };
 
+      var _isAttendancesClosed = function () {
+         return _attendances_closed;
+      };
+
+      var _isAbsencesClosed = function () {
+         return _absences_closed;
+      };
+
       return {
-         getAttendances : _getAttendances,
-         attendances    : _attendances,
-         saveAttendances: _saveAttendances,
-         getAbsenceTypes: _getAbsenceTypes,
-         absenceTypes   : _absenceTypes,
-         setRedLetterDay: _setRedLetterDay,
-         setAbsence     : _setAbsence,
-         removeAbsence  : _removeAbsence
+         getAttendances     : _getAttendances,
+         attendances        : _attendances,
+         saveAttendances    : _saveAttendances,
+         getAbsenceTypes    : _getAbsenceTypes,
+         absenceTypes       : _absenceTypes,
+         setRedLetterDay    : _setRedLetterDay,
+         setAbsence         : _setAbsence,
+         removeAbsence      : _removeAbsence,
+         isAttendancesClosed: _isAttendancesClosed,
+         isAbsencesClosed   : _isAbsencesClosed
       };
    });
 })();
