@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c760b16b81a5e34e5fa47db1c39a8be5",
+    "hash": "422bacdbde6a40c5bb3bd5a00cd4c822",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -728,6 +728,99 @@
             "time": "2014-11-05 13:38:37"
         },
         {
+            "name": "os/php-excel",
+            "version": "dev-master",
+            "target-dir": "PHPExcel",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/abdeltiflouardi/PHPExcel.git",
+                "reference": "9b275bf4fc1d54a3aa87521dee701a8d44ee87f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/abdeltiflouardi/PHPExcel/zipball/9b275bf4fc1d54a3aa87521dee701a8d44ee87f6",
+                "reference": "9b275bf4fc1d54a3aa87521dee701a8d44ee87f6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PHPExcel": "PHPExcel"
+                },
+                "files": [
+                    "PHPExcel.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "LOUARDI Abdeltif",
+                    "email": "louardi.abdeltif@yahoo.fr",
+                    "homepage": "http://phphub.net"
+                }
+            ],
+            "description": "PHP Excel Library",
+            "homepage": "http://github.com/ouardisoft/PHPExcel",
+            "keywords": [
+                "excel"
+            ],
+            "time": "2014-12-04 20:07:30"
+        },
+        {
+            "name": "php-excel-reader/spreadsheet-reader",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rafsoaken/php-excel-reader.git",
+                "reference": "5f0fa65c7fa82c5e29202b7c7809174cbe176a12"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rafsoaken/php-excel-reader/zipball/5f0fa65c7fa82c5e29202b7c7809174cbe176a12",
+                "reference": "5f0fa65c7fa82c5e29202b7c7809174cbe176a12",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PHPExcelReader": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "PHP license version 3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Vadim Tkachenko"
+                },
+                {
+                    "name": "David Sanders"
+                },
+                {
+                    "name": "Matt Kruse"
+                }
+            ],
+            "description": "PHPExcelReader/SpreadsheetReader - A class for reading Microsoft Excel (97/2003) Spreadsheets.",
+            "homepage": "http://code.google.com/p/php-excel-reader/",
+            "keywords": [
+                "excel",
+                "php",
+                "reader",
+                "spreadsheet"
+            ],
+            "time": "2014-05-12 12:34:58"
+        },
+        {
             "name": "swiftmailer/swiftmailer",
             "version": "v5.3.0",
             "source": {
@@ -1362,7 +1455,9 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "kartik-v/yii2-widgets": 20,
-        "kartik-v/yii2-builder": 20
+        "kartik-v/yii2-builder": 20,
+        "php-excel-reader/spreadsheet-reader": 20,
+        "os/php-excel": 20
     },
     "prefer-stable": false,
     "platform": {

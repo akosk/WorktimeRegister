@@ -25,7 +25,7 @@ AppAsset::register($this);
     <script>
         alert('Az Ön böngészője elavult! Az OK gomb megnyomása után válasszon ki egyet az ingyenesen használható ' +
         'modern böngészők közül.');
-        window.location="http://browsehappy.com/?locale=hu";
+        window.location = "http://browsehappy.com/?locale=hu";
     </script>
     <![endif]-->
 
@@ -45,11 +45,6 @@ AppAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items'   => [
-//            [
-//                'label'       => '<i class="glyphicon glyphicon-home"></i>',
-//                'encode' => false,
-//                'url'         => ['/site/index'],
-//            ],
             [
                 'label'   => 'Felhasználókezelés',
                 'visible' => !Yii::$app->user->isGuest,
@@ -129,7 +124,8 @@ AppAsset::register($this);
 
 <footer class="footer">
     <div class="container">
-        <p class="pull-left"><a href="http://iszk.uni-miskolc.hu/">Copyright &copy; <?= date('Y') ?> Miskolci Egyetem Informatikai Szolgáltató
+        <p class="pull-left"><a href="http://iszk.uni-miskolc.hu/">Copyright &copy; <?= date('Y') ?> Miskolci Egyetem
+                Informatikai Szolgáltató
                 Központ</a></p>
 
     </div>

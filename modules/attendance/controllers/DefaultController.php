@@ -11,16 +11,22 @@ use app\modules\attendance\models\Attendance;
 use app\modules\attendance\models\Absence;
 use app\modules\attendance\models\CloseMonth;
 use app\modules\attendance\models\Completion;
+use app\modules\attendance\models\Department;
 use app\modules\attendance\models\RedLetterDay;
+use app\modules\attendance\models\UserImport;
+use app\modules\attendance\models\UserImportSearch;
 use app\modules\attendance\models\UserSearch;
 use DateInterval;
 use DateTime;
+use PHPExcel_Reader_Excel5;
+use Yii;
 use yii\base\Event;
 use yii\caching\ChainedDependency;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
+use yii\rbac\Role;
 use yii\web\Controller;
 use yii\web\HttpException;
 
@@ -398,8 +404,122 @@ class DefaultController extends Controller
 
     public function actionImport()
     {
+
+        if (isset($_FILES['attachment'])) {
+
+            $objReader = new PHPExcel_Reader_Excel5();
+
+            /** Load $inputFileName to a PHPExcel Object  **/
+            $objReader->setReadDataOnly(true);
+            $objPHPExcel = $objReader->load($_FILES['attachment']['tmp_name']);
+
+            $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+            $count = count($sheetData) - 1;
+
+            UserImport::deleteAll();
+            $imported = 0;
+            $error = 0;
+            for ($i = 2; $i <= count($sheetData); $i++) {
+                $userImport = new UserImport();
+                $userImport->taxnumber = (string)$sheetData[$i]['A'];
+                $userImport->relationship = $sheetData[$i]['B'];
+                $userImport->num = $sheetData[$i]['C'];
+                $userImport->name_prefix = $sheetData[$i]['D'];
+                $userImport->name = $sheetData[$i]['E'];
+                $userImport->reference_number = $sheetData[$i]['F'];
+                $userImport->department_code = $sheetData[$i]['G'];
+                $userImport->department_name = $sheetData[$i]['H'];
+                $userImport->group = $sheetData[$i]['I'];
+                $userImport->admin = count($sheetData[$i]['J']) == 0 ? 0 : 1;
+                if ($userImport->save()) {
+                    $imported++;
+                } else {
+                    $error++;
+                }
+            }
+
+//            Szervezeti egységek törzs frissítése
+
+            $q = "SELECT DISTINCT t.department_code,t.department_name,d.id FROM user_import t
+                 LEFT JOIN department d ON d.code=t.department_code ";
+
+            $departments = Yii::$app->db->createCommand($q)->queryAll();
+            for ($i = 0; $i < count($departments); $i++) {
+                if (!$departments[$i]['id']) {
+                    $department = new Department();
+                    $department->code = $departments[$i]['department_code'];
+                    $department->name = ucfirst(
+                        mb_strtolower($departments[$i]['department_name'],
+                            mb_detect_encoding($departments[$i]['department_name']))
+                    );
+                    $department->save(false);
+                }
+            }
+
+//            Felhasználó szervezeti egységének frissítése
+
+            $q = "UPDATE profile
+                LEFT JOIN user_import ui ON ui.taxnumber=profile.taxnumber
+                LEFT JOIN department d ON ui.department_code=d.code
+                SET department_id=d.id";
+            Yii::$app->db->createCommand($q)->execute();
+
+//            Felhasználó role-ok frissítése
+
+            $q = "SELECT p.user_id, t.`group`, t.admin
+FROM user_import t
+INNER JOIN profile p ON p.taxnumber=t.taxnumber";
+
+
+            $res = Yii::$app->db->createCommand($q)->queryAll();
+            $auth = \Yii::$app->authManager;
+            $instructor = $auth->getRole('instructor');
+            $dep_leader = $auth->getRole('dep_leader');
+            $worker = $auth->getRole('worker');
+
+            for ($i = 0; $i < count($res); $i++) {
+                if (strtolower(substr($res[$i]['group'], 0, 3)) == "nem") {
+                    $auth->revoke($instructor, $res[$i]['user_id']);
+                    $this->assignRole($worker,$res[$i]['user_id']);
+                } else {
+                    $this->assignRole($instructor,$res[$i]['user_id']);
+                    $auth->revoke($worker, $res[$i]['user_id']);
+                }
+
+                if ($res[$i]['admin']==1) {
+                    $this->assignRole($dep_leader,$res[$i]['user_id']);
+                } else {
+                    $auth->revoke($worker, $res[$i]['user_id']);
+                }
+            }
+
+            if ($imported == $count) {
+                Yii::$app->getSession()->setFlash('success', "<strong>Kész!</strong> $count felhasználó importálása sikeresen megtörtént.");
+            } else {
+                Yii::$app->getSession()->setFlash('error', "<strong>Hiba!</strong> {$count}/{$imported} felhasználó
+                került importálásra.");
+            }
+
+
+        }
+
+
+        $userImportSearch = new UserImportSearch();
+        $dataProvider = $userImportSearch->search(\Yii::$app->request->queryParams);
+
         return $this->render('import', [
+            'dataProvider'     => $dataProvider,
+            'userImportSearch' => $userImportSearch,
         ]);
+
+    }
+
+    protected function assignRole(Role $role, $user_id)
+    {
+        $assingment=\Yii::$app->authManager->getAssignment($role->name,$user_id);
+        if (!$assingment) {
+            \Yii::$app->authManager->assign($role, $user_id);
+        }
 
     }
 
