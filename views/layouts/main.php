@@ -19,6 +19,16 @@ AppAsset::register($this);
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
+
+
+    <!--[if lt IE 9 ]>
+    <script>
+        alert('Az Ön böngészője elavult! Az OK gomb megnyomása után válasszon ki egyet az ingyenesen használható ' +
+        'modern böngészők közül.');
+        window.location="http://browsehappy.com/?locale=hu";
+    </script>
+    <![endif]-->
+
 </head>
 <body>
 
