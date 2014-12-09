@@ -179,7 +179,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <br/>
 
 
-                    <div class="row">
+                    <div class="row" style="margin-bottom:15px" ng-show="isAdmin">
 
                         <div class="col-md-2"><span
                                 class="btn btn-success btn-xs"
@@ -188,10 +188,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <strong>Ü</strong>
                             </span></div>
                         <div class="col-md-10">Ünnepnapra állítás</div>
+                        <br/>
                     </div>
-                    <br/>
 
-                    <div class="row">
+
+                    <div class="row" style="margin-bottom:15px" ng-show="isAdmin">
                         <div class="col-md-2"><span
                                 class="btn btn-success btn-xs"
                                 style="font-size:17px"
@@ -199,8 +200,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <strong>M</strong>
                             </span></div>
                         <div class="col-md-10">Munkanapra állítás</div>
+                        <br/>
                     </div>
-                    <br/>
+
 
                     <div class="row">
 
