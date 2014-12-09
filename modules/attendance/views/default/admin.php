@@ -9,6 +9,7 @@
 
 use kartik\widgets\AlertBlock;
 use yii\grid\GridView;
+use yii\helpers\Html;
 use yii\helpers\Url;
 
 $this->title = Yii::t('attendance', 'Jelenlétek és zárolások');
@@ -107,7 +108,7 @@ echo AlertBlock::widget([
                         'value'  => function ($data, $id, $index, $dataColumn) {
                             $pieces = array_keys(Yii::$app->authManager->getRolesByUser($data->id));
                             $roles = implode(' ', array_map(function ($data) {
-                                return '<span class="label label-default">'.Yii::t('app', $data).'</span>';
+                                return '<span class="label label-default">' . Yii::t('app', $data) . '</span>';
                             }, $pieces));
                             return $roles;
                         },
@@ -122,7 +123,35 @@ echo AlertBlock::widget([
                         glyphicon-ok"></i>' : '';
                         },
                         'format'    => 'raw',
-                    ]
+                    ],
+                    [
+                        'class'    => 'yii\grid\ActionColumn',
+                        'contentOptions'  => [
+                            'style' => 'min-width:40px'
+                        ],
+                        'template' => '{add-dep-admin} {remove-dep-admin}',
+                        'buttons'  => [
+                            'add-dep-admin'    => function ($url, $model) {
+                                $roles=Yii::$app->authManager->getAssignments($model->id);
+                                if (is_array($roles) && $roles['dep_admin']) return '';
+                                return Html::a('<i class="glyphicon glyphicon-user"></i>', $url, [
+                                    'class' => 'btn btn-xs btn-info',
+                                    'title' => Yii::t('yii',
+                                        'Szervezeti egység adminisztrátor szerepkör hozzáadása'),
+                                ]);
+                            },
+                            'remove-dep-admin' => function ($url, $model) {
+                                $roles=Yii::$app->authManager->getAssignments($model->id);
+                                if (is_array($roles) && !$roles['dep_admin']) return '';
+                                return Html::a('<i class="glyphicon glyphicon-user"></i>', $url, [
+                                    'class'        => 'btn btn-xs btn-danger',
+                                    'title' => Yii::t('yii',
+                                        'Szervezeti egység adminisztrátor szerepkör eltávolítás'),
+                                ]);
+                            },
+                        ]
+                    ],
+
                 ],
             ]);
 

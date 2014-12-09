@@ -47,7 +47,8 @@ class DefaultController extends Controller
                     [
                         'actions' => ['index', 'get-attendances', 'save-attendances', 'set-red-letter-day',
                             'set-absence', 'remove-absence', 'admin', 'import', 'close',
-                            'set-instructor-attendance', 'get-instructor-attendance'],
+                            'set-instructor-attendance', 'get-instructor-attendance',
+                            'add-dep-admin', 'remove-dep-admin'],
                         'allow'   => true,
                         'roles'   => ['@'],
                     ],
@@ -562,6 +563,23 @@ class DefaultController extends Controller
 
         return Json::encode(['value' => $completion !== null]);
 
+    }
+
+    public function actionAddDepAdmin($id)
+    {
+        $auth = \Yii::$app->authManager;
+        $dep_admin = $auth->getRole('dep_admin');
+        $auth->assign($dep_admin,$id);
+
+        return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
+    }
+ public function actionRemoveDepAdmin($id)
+    {
+        $auth = \Yii::$app->authManager;
+        $dep_admin = $auth->getRole('dep_admin');
+        $auth->revoke($dep_admin,$id);
+
+        return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
     }
 
 }
