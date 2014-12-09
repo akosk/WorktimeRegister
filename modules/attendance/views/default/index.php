@@ -89,7 +89,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <input type="text"
                                        class="form-control"
                                        style="max-width:120px"
-                                       ng-model="a.to" empty-to-null
+                                       ng-model="a.to"
+                                       empty-to-null
+                                       ak-time-mask
                                        ng-focus="setFocusedItem(a)"
                                        ng-blur="unsetFocusedItem(a)"
                                        placeholder="Távozás ideje"
