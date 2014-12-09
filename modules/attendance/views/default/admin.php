@@ -74,7 +74,8 @@ echo AlertBlock::widget([
 
                     <?php if ($closeMonth->absences_closed != 1) { ?>
                         <button id='absences-close-btn' class="btn btn-danger"
-                           >Távollétek zárolása</button>
+                            >Távollétek zárolása
+                        </button>
                     <?php } else { ?>
                         <span class="btn disabled"><i class="fa fa-lock" role="alert"></i> A távollétek zárolva.</span>
                     <?php } ?>
@@ -99,6 +100,20 @@ echo AlertBlock::widget([
                 'columns'      => [
                     'username',
                     'profile.name',
+                    'profile.taxnumber',
+                    'profile.department.name',
+                    [
+                        'label'  => 'Szerepkörök',
+                        'value'  => function ($data, $id, $index, $dataColumn) {
+                            $pieces = array_keys(Yii::$app->authManager->getRolesByUser($data->id));
+                            $roles = implode(' ', array_map(function ($data) {
+                                return '<span class="label label-default">'.Yii::t('app', $data).'</span>';
+                            }, $pieces));
+                            return $roles;
+                        },
+                        'format' => 'raw',
+                    ],
+
                     [
                         'label'     => 'Kitöltötte',
                         'attribute' => 'currentCompletions.id',

@@ -42,8 +42,8 @@ class Department extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('attendance', 'ID'),
-            'code' => Yii::t('attendance', 'Code'),
-            'name' => Yii::t('attendance', 'Name'),
+            'code' => Yii::t('attendance', 'Kód'),
+            'name' => Yii::t('attendance', 'Szervezeti egység neve'),
         ];
     }
 
