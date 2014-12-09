@@ -2,6 +2,7 @@
 
 namespace app\modules\attendance\controllers;
 
+use app\components\assetbundles\BootstrapSweetAlertAsset;
 use app\components\assetbundles\FontawesomeAsset;
 use app\components\DateHelper;
 use app\components\LdapManager;
@@ -274,6 +275,7 @@ class DefaultController extends Controller
 
     public function actionAdmin()
     {
+
         $year = isset($_GET['year']) ? $_GET['year'] : date("Y");
         $month = isset($_GET['month']) ? $_GET['month'] : date("m");
 
@@ -303,6 +305,7 @@ class DefaultController extends Controller
 
 
         FontawesomeAsset::register($this->getView());
+        BootstrapSweetAlertAsset::register($this->getView());
 
 
         return $this->render('admin', [
