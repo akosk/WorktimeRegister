@@ -3,7 +3,7 @@
  */
 
 /*jshint loopfunc: true */
-/*global  isAdmin: true */
+/*global  isAdmin: true, isPayrollManager: true, isInstructor:true, isDepLeader:true, isDepAdmin:true */
 
 var attendanceModule;
 
@@ -53,9 +53,27 @@ var attendanceModule;
          $scope.isBusy = true;
          $scope.isSave = false;
          $scope.isAdmin = isAdmin;
+         $scope.isDepLeader = isDepLeader;
+         $scope.isDepAdmin = isDepAdmin;
+         $scope.isInstructor = isInstructor;
+         $scope.isPayrollManager = isPayrollManager;
          $scope.helpers = helpers;
 
 
+         $scope.$watch('instructorAttendance', function (newData, oldData) {
+            if (newData !== null && newData !== undefined) {
+               dataService.setInstructorAttendance($scope.year, $scope.month, newData)
+                  .then(
+                  function () {
+                  },
+                  function () {
+                     console.log("Cannot set instructor attendances!");
+                  }
+               )
+                  .then(function () {
+                  });
+            }
+         });
 
          $scope.$watch('ourData', function (newVal, oldVal) {
             if (oldVal.attendances.length !== 0 && $scope.isAttendancesValid()) {
@@ -63,7 +81,7 @@ var attendanceModule;
                   return item.from !== oldVal.attendances[idx].from || item.to !== oldVal.attendances[idx].to;
                });
                if (firstChanged !== undefined) {
-                  $scope.oldFocusedItem= _.clone(firstChanged);
+                  $scope.oldFocusedItem = _.clone(firstChanged);
                   $scope.isSave = true;
                   dataService.saveAttendances().then(
                      function () {
@@ -108,7 +126,7 @@ var attendanceModule;
                return true;
             }
             var regex = /([01]\d|2[0-3]):([0-5]\d)/;
-            return regex.test(time) && time.length===5;
+            return regex.test(time) && time.length === 5;
          };
 
          $scope.isValid = function (item) {
@@ -252,6 +270,22 @@ var attendanceModule;
          };
 
          $scope.getAttendances();
+
+         if ($scope.isInstructor) {
+            dataService.getInstructorAttendance($scope.year, $scope.month)
+               .then(
+               function () {
+               },
+               function () {
+                  console.log("Cannot get instructor attendance!");
+               }
+            )
+               .then(function () {
+                  $scope.instructorAttendance = dataService.getInstructorAttendanceValue();
+               });
+
+         }
+
       }
    );
 

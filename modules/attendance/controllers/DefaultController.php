@@ -45,7 +45,8 @@ class DefaultController extends Controller
                 'rules' => [
                     [
                         'actions' => ['index', 'get-attendances', 'save-attendances', 'set-red-letter-day',
-                            'set-absence', 'remove-absence', 'admin', 'import', 'close'],
+                            'set-absence', 'remove-absence', 'admin', 'import', 'close',
+                            'set-instructor-attendance', 'get-instructor-attendance'],
                         'allow'   => true,
                         'roles'   => ['@'],
                     ],
@@ -515,6 +516,49 @@ class DefaultController extends Controller
         return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
     }
 
+    public function actionSetInstructorAttendance($year, $month, $value)
+    {
+//        TODO: Authorization
 
+        $user = User::findOne(\Yii::$app->user->id);
+
+        if (strtolower($value) == 'false') {
+            Completion::deleteAll('year=:year AND month=:month AND user_id=:user_id', [
+                ':year'    => $year,
+                ':month'   => $month,
+                ':user_id' => \Yii::$app->user->id,
+            ]);
+        } else {
+            $completion = Completion::find()->where('year=:year AND month=:month AND user_id=:user_id', [
+                ':year'    => $year,
+                ':month'   => $month,
+                ':user_id' => \Yii::$app->user->id,
+            ])->one();
+            if (!$completion) {
+                $completion = new Completion();
+                $completion->user_id = \Yii::$app->user->id;
+                $completion->year = $year;
+                $completion->month = $month;
+                $completion->save();
+            }
+        }
+
+    }
+
+    public function actionGetInstructorAttendance($year, $month)
+    {
+//        TODO: Authorization
+
+        $user = User::findOne(\Yii::$app->user->id);
+
+        $completion = Completion::find()->where('year=:year AND month=:month AND user_id=:user_id', [
+            ':year'    => $year,
+            ':month'   => $month,
+            ':user_id' => \Yii::$app->user->id,
+        ])->one();
+
+        return Json::encode(['value' => $completion !== null]);
+
+    }
 
 }

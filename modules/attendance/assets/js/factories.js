@@ -121,6 +121,7 @@
       var _attendances = [];
       var _attendances_closed = false;
       var _absences_closed = false;
+      var _instructorAttendance = false;
 
       var _absenceTypes = [
          {id: '1', code: '25004', label: 'TERHESSÉGI GYERMEKÁGYI SEGÉLY'},
@@ -282,6 +283,53 @@
 
       };
 
+      var _setInstructorAttendance = function (year, month, value) {
+         var deferred = $q.defer();
+
+
+         $http({
+            url   : BASE_URL + 'attendance/default/set-instructor-attendance',
+            method: "GET",
+            params: {
+               year : year,
+               month: month,
+               value: value
+            }
+         })
+            .then(function (result) {
+               deferred.resolve();
+            }, function () {
+               deferred.reject();
+            });
+         return deferred.promise;
+
+
+      };
+
+      var _getInstructorAttendance = function (year, month) {
+         var deferred = $q.defer();
+
+
+         $http({
+            url   : BASE_URL + 'attendance/default/get-instructor-attendance',
+            method: "GET",
+            params: {
+               year : year,
+               month: month
+            }
+         })
+            .then(function (result) {
+               _instructorAttendance = result.data.value;
+               deferred.resolve();
+            }, function () {
+               deferred.reject();
+            });
+         return deferred.promise;
+
+
+      };
+
+
       var _isAttendancesClosed = function () {
          return _attendances_closed;
       };
@@ -290,17 +338,25 @@
          return _absences_closed;
       };
 
+      var _getInstructorAttendanceValue = function () {
+         return _instructorAttendance;
+      };
+
       return {
-         getAttendances     : _getAttendances,
-         attendances        : _attendances,
-         saveAttendances    : _saveAttendances,
-         getAbsenceTypes    : _getAbsenceTypes,
-         absenceTypes       : _absenceTypes,
-         setRedLetterDay    : _setRedLetterDay,
-         setAbsence         : _setAbsence,
-         removeAbsence      : _removeAbsence,
-         isAttendancesClosed: _isAttendancesClosed,
-         isAbsencesClosed   : _isAbsencesClosed
+         getAttendances              : _getAttendances,
+         attendances                 : _attendances,
+         saveAttendances             : _saveAttendances,
+         getAbsenceTypes             : _getAbsenceTypes,
+         absenceTypes                : _absenceTypes,
+         setRedLetterDay             : _setRedLetterDay,
+         setAbsence                  : _setAbsence,
+         removeAbsence               : _removeAbsence,
+         isAttendancesClosed         : _isAttendancesClosed,
+         isAbsencesClosed            : _isAbsencesClosed,
+         instructorAttendance        : _instructorAttendance,
+         setInstructorAttendance     : _setInstructorAttendance,
+         getInstructorAttendance     : _getInstructorAttendance,
+         getInstructorAttendanceValue: _getInstructorAttendanceValue
       };
    });
 })();
