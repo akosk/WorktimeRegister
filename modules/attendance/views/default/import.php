@@ -11,11 +11,6 @@ use yii\grid\GridView;
 
 ?>
 
-<div class="alert alert-danger">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    <strong>Fejlesztés alatt!</strong> A menüpont jelenleg fejlesztés alatt van, elnézést az esetleges
-    kellemetlenségekért.
-</div>
 
 <div class="panel panel-primary">
     <div class="panel-heading">

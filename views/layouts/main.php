@@ -46,47 +46,35 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items'   => [
             [
-                'label'   => 'Felhasználókezelés',
-                'visible' => !Yii::$app->user->isGuest,
+                'label'   => 'Adószám',
+                'url'     => ['//user/security/taxnumber'],
+                'visible' => !Yii::$app->user->isGuest
+            ],
+
+            [
+                'label'   => 'Jelenléti ív',
+                'url'     => ['//attendance/default/index'],
+                'visible' => !Yii::$app->user->isGuest
+            ],
+
+            [
+                'label'   => 'Adminisztráció',
+                'visible' =>    Yii::$app->user->can('admin') ||
+                                Yii::$app->user->can('dep_admin') ||
+                                Yii::$app->user->can('dep_leader') ||
+                                Yii::$app->user->can('payroll_manager'),
                 'items'   => [
+
                     [
                         'label'   => 'Felhasználókezelés',
                         'url'     => ['//user/admin/index'],
                         'visible' => Yii::$app->user->can('admin'),
                     ],
-                    [
-                        'label'   => 'Saját profil',
-                        'url'     => ['//user/profile/index'],
-                        'visible' => !Yii::$app->user->isGuest
-                    ],
-                    [
-                        'label'   => 'Saját profil szerkesztése',
-                        'url'     => ['//user/settings/profile'],
-                        'visible' => !Yii::$app->user->isGuest
-                    ],
-                    [
-                        'label'   => 'Adószám',
-                        'url'     => ['//user/security/taxnumber'],
-                        'visible' => !Yii::$app->user->isGuest
-                    ],
-
-                ]
-            ],
-
-            [
-                'label'   => 'Jelenlét',
-                'visible' => !Yii::$app->user->isGuest,
-                'items'   => [
-                    [
-                        'label'   => 'Jelenléti ív',
-                        'url'     => ['//attendance/default/index'],
-                        'visible' => !Yii::$app->user->isGuest
-                    ],
 
                     [
                         'label'   => 'Jelenlétek és zárolás',
                         'url'     => ['//attendance/default/admin'],
-                        'visible' => !Yii::$app->user->isGuest
+//                        'visible' => !Yii::$app->user->isGuest
                     ],
 
                     [
@@ -95,11 +83,11 @@ AppAsset::register($this);
                         'visible' => Yii::$app->user->can('admin'),
                     ],
 
-                    [
-                        'label'   => 'Szervezeti egységek',
-//                        'url'     => ['//attendance/default/unions'],
-                        'visible' => Yii::$app->user->can('admin'),
-                    ],
+//                    [
+//                        'label'   => 'Szervezeti egységek',
+////                        'url'     => ['//attendance/default/unions'],
+//                        'visible' => Yii::$app->user->can('admin'),
+//                    ],
 
                 ]
             ],
