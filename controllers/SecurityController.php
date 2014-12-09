@@ -84,6 +84,9 @@ class SecurityController extends BaseSecurityController
                 $taxnumberWasEmpty = $model->taxnumber == '';
                 $model->taxnumber = $taxnumber;
                 $model->save();
+                $user->updateUserDepartmentId($user->id);
+                $user->updateUserRoles($user->id);
+
                 if ($taxnumberWasEmpty) {
                     Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/index'));
                 } else {

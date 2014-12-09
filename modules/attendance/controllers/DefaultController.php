@@ -456,42 +456,9 @@ class DefaultController extends Controller
                 }
             }
 
-//            Felhasználó szervezeti egységének frissítése
-
-            $q = "UPDATE profile
-                LEFT JOIN user_import ui ON ui.taxnumber=profile.taxnumber
-                LEFT JOIN department d ON ui.department_code=d.code
-                SET department_id=d.id";
-            Yii::$app->db->createCommand($q)->execute();
-
-//            Felhasználó role-ok frissítése
-
-            $q = "SELECT p.user_id, t.`group`, t.admin
-FROM user_import t
-INNER JOIN profile p ON p.taxnumber=t.taxnumber";
-
-
-            $res = Yii::$app->db->createCommand($q)->queryAll();
-            $auth = \Yii::$app->authManager;
-            $instructor = $auth->getRole('instructor');
-            $dep_leader = $auth->getRole('dep_leader');
-            $worker = $auth->getRole('worker');
-
-            for ($i = 0; $i < count($res); $i++) {
-                if (strtolower(substr($res[$i]['group'], 0, 3)) == "nem") {
-                    $auth->revoke($instructor, $res[$i]['user_id']);
-                    $this->assignRole($worker,$res[$i]['user_id']);
-                } else {
-                    $this->assignRole($instructor,$res[$i]['user_id']);
-                    $auth->revoke($worker, $res[$i]['user_id']);
-                }
-
-                if ($res[$i]['admin']==1) {
-                    $this->assignRole($dep_leader,$res[$i]['user_id']);
-                } else {
-                    $auth->revoke($worker, $res[$i]['user_id']);
-                }
-            }
+            $user = new User();
+            $user->updateUserDepartmentId();
+            $user->updateUserRoles();
 
             if ($imported == $count) {
                 Yii::$app->getSession()->setFlash('success', "<strong>Kész!</strong> $count felhasználó importálása sikeresen megtörtént.");
@@ -514,14 +481,6 @@ INNER JOIN profile p ON p.taxnumber=t.taxnumber";
 
     }
 
-    protected function assignRole(Role $role, $user_id)
-    {
-        $assingment=\Yii::$app->authManager->getAssignment($role->name,$user_id);
-        if (!$assingment) {
-            \Yii::$app->authManager->assign($role, $user_id);
-        }
-
-    }
 
     public function actionClose($year, $month, $target)
     {
@@ -555,6 +514,7 @@ INNER JOIN profile p ON p.taxnumber=t.taxnumber";
 
         return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
     }
+
 
 
 }

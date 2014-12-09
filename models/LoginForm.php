@@ -82,6 +82,7 @@ class LoginForm extends BaseLoginForm
                 $profile->name=$entry['sn'][0].' '.$entry['givenname'][0];
                 $profile->public_email=$user->email;
                 if (!$profile->save(false)) {
+
                     $this->addError('login', \Yii::t('user', 'A felhasználó profil létrehozása sikertelen'));
                 }
             } else {
