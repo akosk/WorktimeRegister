@@ -3,7 +3,8 @@
  */
 
 /*jshint loopfunc: true */
-/*global  isAdmin: true, isPayrollManager: true, isInstructor:true, isDepLeader:true, isDepAdmin:true */
+/*global    isAdmin: true, isPayrollManager: true, isInstructor:true, isDepLeader:true, isDepAdmin:true,
+            userId: true */
 
 var attendanceModule;
 
@@ -58,11 +59,12 @@ var attendanceModule;
          $scope.isInstructor = isInstructor;
          $scope.isPayrollManager = isPayrollManager;
          $scope.helpers = helpers;
+         $scope.userId = userId;
 
 
          $scope.$watch('instructorAttendance', function (newData, oldData) {
             if (newData !== null && newData !== undefined) {
-               dataService.setInstructorAttendance($scope.year, $scope.month, newData)
+               dataService.setInstructorAttendance($scope.year, $scope.month, newData, $scope.userId)
                   .then(
                   function () {
                   },
@@ -83,7 +85,7 @@ var attendanceModule;
                if (firstChanged !== undefined) {
                   $scope.oldFocusedItem = _.clone(firstChanged);
                   $scope.isSave = true;
-                  dataService.saveAttendances().then(
+                  dataService.saveAttendances($scope.userId).then(
                      function () {
                         console.log("Attendances saved.");
                      },
@@ -106,7 +108,7 @@ var attendanceModule;
          };
 
          $scope.getAttendances = function () {
-            dataService.getAttendances($scope.year, $scope.month)
+            dataService.getAttendances($scope.year, $scope.month, $scope.userId)
                .then(
                function () {
                },
@@ -156,7 +158,7 @@ var attendanceModule;
             item.from = null;
             item.to = null;
             if (item.userAbsence !== undefined) {
-               dataService.removeAbsence(item.date)
+               dataService.removeAbsence(item.date, $scope.userId)
                   .then(
                   function () {
                   },
@@ -248,7 +250,7 @@ var attendanceModule;
          $scope.setAbsence = function (item, absenceType) {
             $scope.focusedItem = item;
             $scope.isSave = true;
-            dataService.setAbsence(item.date, absenceType.code)
+            dataService.setAbsence(item.date, absenceType.code, $scope.userId)
                .then(
                function () {
                },
@@ -272,7 +274,7 @@ var attendanceModule;
          $scope.getAttendances();
 
          if ($scope.isInstructor) {
-            dataService.getInstructorAttendance($scope.year, $scope.month)
+            dataService.getInstructorAttendance($scope.year, $scope.month, $scope.userId)
                .then(
                function () {
                },

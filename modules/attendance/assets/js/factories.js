@@ -158,10 +158,10 @@
          });
       };
 
-      var _getAttendances = function (year, month) {
+      var _getAttendances = function (year, month, userId) {
          var deferred = $q.defer();
          $http({
-            url   : BASE_URL + 'attendance/default/get-attendances',
+            url   : BASE_URL + 'attendance/default/get-attendances/' + userId,
             method: "GET",
             params: {year: year, month: month}
          })
@@ -183,7 +183,7 @@
          return deferred.promise;
       };
 
-      var _saveAttendances = function () {
+      var _saveAttendances = function (userId) {
          var csrfToken = $('meta[name="csrf-token"]').attr("content");
          var deferred = $q.defer();
 
@@ -196,8 +196,9 @@
             }
             return item;
          });
+
          $http({
-            url   : BASE_URL + 'attendance/default/save-attendances',
+            url   : BASE_URL + 'attendance/default/save-attendances/' + userId,
             method: "POST",
             data  : data
          })
@@ -239,7 +240,7 @@
       };
 
 
-      var _setAbsence = function (date, code) {
+      var _setAbsence = function (date, code, userId) {
          var deferred = $q.defer();
 
          var d = {
@@ -249,7 +250,7 @@
 
 
          $http({
-            url   : BASE_URL + 'attendance/default/set-absence',
+            url   : BASE_URL + 'attendance/default/set-absence/' + userId,
             method: "POST",
             data  : d
          })
@@ -262,7 +263,7 @@
 
       };
 
-      var _removeAbsence = function (date) {
+      var _removeAbsence = function (date, userId) {
          var deferred = $q.defer();
 
          var d = {
@@ -270,7 +271,7 @@
          };
 
          $http({
-            url   : BASE_URL + 'attendance/default/remove-absence',
+            url   : BASE_URL + 'attendance/default/remove-absence/' + userId,
             method: "POST",
             data  : d
          })
@@ -283,12 +284,12 @@
 
       };
 
-      var _setInstructorAttendance = function (year, month, value) {
+      var _setInstructorAttendance = function (year, month, value, userId) {
          var deferred = $q.defer();
 
 
          $http({
-            url   : BASE_URL + 'attendance/default/set-instructor-attendance',
+            url   : BASE_URL + 'attendance/default/set-instructor-attendance/' + userId,
             method: "GET",
             params: {
                year : year,
@@ -306,12 +307,12 @@
 
       };
 
-      var _getInstructorAttendance = function (year, month) {
+      var _getInstructorAttendance = function (year, month, userId) {
          var deferred = $q.defer();
 
 
          $http({
-            url   : BASE_URL + 'attendance/default/get-instructor-attendance',
+            url   : BASE_URL + 'attendance/default/get-instructor-attendance/' + userId,
             method: "GET",
             params: {
                year : year,

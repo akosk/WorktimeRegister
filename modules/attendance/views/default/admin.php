@@ -127,9 +127,9 @@ echo AlertBlock::widget([
                     [
                         'class'    => 'yii\grid\ActionColumn',
                         'contentOptions'  => [
-                            'style' => 'min-width:40px'
+                            'style' => 'min-width:80px'
                         ],
-                        'template' => '{add-dep-admin} {remove-dep-admin}',
+                        'template' => '{add-dep-admin} {remove-dep-admin} {index}',
                         'buttons'  => [
                             'add-dep-admin'    => function ($url, $model) {
                                 $roles=Yii::$app->authManager->getAssignments($model->id);
@@ -147,6 +147,15 @@ echo AlertBlock::widget([
                                     'class'        => 'btn btn-xs btn-danger',
                                     'title' => Yii::t('yii',
                                         'Szervezeti egység adminisztrátor szerepkör eltávolítás'),
+                                ]);
+                            },
+                            'index' => function ($url, $model) {
+                                $roles=Yii::$app->authManager->getAssignments($model->id);
+//                                if (is_array($roles) && !$roles['dep_admin']) return '';
+                                return Html::a('<i class="glyphicon glyphicon-eye-open"></i>', $url, [
+                                    'class'        => 'btn btn-xs btn-info',
+                                    'title' => Yii::t('yii',
+                                        $model->profile->name.' jelenléti ívének megtekintése'),
                                 ]);
                             },
                         ]

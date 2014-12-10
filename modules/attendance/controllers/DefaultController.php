@@ -57,21 +57,25 @@ class DefaultController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actionIndex($id = null)
     {
         \Yii::$app->assetManager->forceCopy = true;
-
         AttendanceAsset::register($this->getView());
 
-        $user = User::findOne(\Yii::$app->user->id);
+        if ($id === null) {
+            $id = \Yii::$app->user->id;
+        }
+
+        $user = User::findOne($id);
 
         return $this->render('index', [
-            'user' => $user
+            'user' => $user,
+            'userRoles' => Yii::$app->authManager->getRolesByUser($id)
         ]);
     }
 
 
-    public function actionGetAttendances($year, $month, $user_id = null)
+    public function actionGetAttendances($id, $year, $month)
     {
         $data = [];
         $redLetterDays = RedLetterDay::find()->where('YEAR(date)=:year AND MONTH(date)=:month',
@@ -88,7 +92,7 @@ class DefaultController extends Controller
         }
 
         $absences = Absence::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
-            [':year' => $year, ':month' => $month, ':userId' => \Yii::$app->user->id])->all();
+            [':year' => $year, ':month' => $month, ':userId' => $id])->all();
 
         foreach ($absences as $item) {
             $data['attendances'][$item->date] = ArrayHelper::merge($data['attendances'][$item->date], [
@@ -101,7 +105,7 @@ class DefaultController extends Controller
         }
 
         $attendances = Attendance::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
-            [':year' => $year, ':month' => $month, ':userId' => \Yii::$app->user->id])->all();
+            [':year' => $year, ':month' => $month, ':userId' => $id])->all();
 
 
         foreach ($attendances AS $item) {
@@ -117,7 +121,7 @@ class DefaultController extends Controller
             $data['attendances'] = array_values($data['attendances']);
         }
 
-        $currentUser = User::findOne(\Yii::$app->user->id);
+        $currentUser = User::findOne($id);
 
         $data['absences_closed'] = CloseMonth::isAbsencesClosed($year, $month, $currentUser->profile->department->id);
         $data['attendances_closed'] = CloseMonth::isAttendancesClosed($year, $month,
@@ -126,12 +130,12 @@ class DefaultController extends Controller
         echo Json::encode($data);
     }
 
-    public function actionSaveAttendances()
+    public function actionSaveAttendances($id)
     {
         $json = file_get_contents("php://input");
         $attendances = Json::decode($json);
 
-        $currentUser = User::findOne(\Yii::$app->user->id);
+        $currentUser = User::findOne($id);
 
         if (count($attendances) > 0) {
             $dtime = DateTime::createFromFormat("Y-m-d", $attendances[0]['date']);
@@ -154,18 +158,20 @@ class DefaultController extends Controller
         foreach ($attendances AS $item) {
             if ($item['absence'] == Attendance::WORKDAY || !isset($item['absence'])) {
                 $attendance = Attendance::find()->where('date=:date AND user_id=:userId',
-                    [':date' => $item['date'], ':userId' => \Yii::$app->user->id])->one();
+                    [':date' => $item['date'], ':userId' => $id])->one();
                 if (!$attendance) {
                     if (!($item['from'] || $item['end'])) {
                         continue;
                     }
                     $attendance = new Attendance();
-                    $attendance->user_id = \Yii::$app->user->id;
+                    $attendance->user_id = $id;
                     $attendance->create_user_id = \Yii::$app->user->id;
                     $attendance->create_time = new \yii\db\Expression('NOW()');
                 }
 
                 $attendance->date = $item['date'];
+                $attendance->update_user_id = \Yii::$app->user->id;
+                $attendance->update_time = new \yii\db\Expression('NOW()');
 
                 $attendance->start = $item['from'] ? $item['date'] . " " . $item['from'] : null;
                 $attendance->end = $item['to'] ? $item['date'] . " " . $item['to'] : null;
@@ -180,7 +186,7 @@ class DefaultController extends Controller
 
             $year = date('Y', $timestamp);
             $month = date('m', $timestamp);
-            $this->checkIsMonthCompleted(\Yii::$app->user->id, $year, $month);
+            $this->checkIsMonthCompleted($id, $year, $month);
         }
 
         echo "OK";
@@ -207,13 +213,13 @@ class DefaultController extends Controller
         echo "OK";
     }
 
-    public function actionSetAbsence()
+    public function actionSetAbsence($id)
     {
         $json = file_get_contents("php://input");
         $data = Json::decode($json);
         if (is_array($data)) {
 
-            $currentUser = User::findOne(\Yii::$app->user->id);
+            $currentUser = User::findOne($id);
 
             if (CloseMonth::isAbsencesClosed(
                 date("Y", strtotime($data['date'])),
@@ -225,16 +231,16 @@ class DefaultController extends Controller
             }
 
             $absence = Absence::find()->where('user_id=:user_id && date=:date', [
-                ':user_id' => \Yii::$app->user->id,
+                ':user_id' => $id,
                 ':date'    => $data['date']])->one();
             if (!$absence) {
                 $absence = new Absence();
                 $absence->date = $data['date'];
-                $absence->user_id = \Yii::$app->user->id;
+                $absence->user_id = $id;
             }
             $absence->code = $data['code'];
             $absence->create_time = new \yii\db\Expression('NOW()');
-            $absence->create_user = \Yii::$app->user->id;
+            $absence->create_user =\Yii::$app->user->id;
             $absence->save();
 
             $dtime = DateTime::createFromFormat("Y-m-d", $data['date']);
@@ -243,7 +249,9 @@ class DefaultController extends Controller
             $year = date('Y', $timestamp);
             $month = date('m', $timestamp);
 
-            $this->checkIsMonthCompleted(\Yii::$app->user->id, $year, $month);
+
+            $this->checkIsMonthCompleted($id, $year, $month);
+
 
         }
 
@@ -252,13 +260,13 @@ class DefaultController extends Controller
 
     }
 
-    public function actionRemoveAbsence()
+    public function actionRemoveAbsence($id)
     {
         $json = file_get_contents("php://input");
         $data = Json::decode($json);
         if (is_array($data) && isset($data['date'])) {
             $absence = Absence::deleteAll('user_id=:user_id && date=:date', [
-                ':user_id' => \Yii::$app->user->id,
+                ':user_id' => $id,
                 ':date'    => $data['date']]);
 
 
@@ -268,7 +276,7 @@ class DefaultController extends Controller
             $year = date('Y', $timestamp);
             $month = date('m', $timestamp);
 
-            $this->checkIsMonthCompleted(\Yii::$app->user->id, $year, $month);
+            $this->checkIsMonthCompleted($id, $year, $month);
         }
         echo "OK";
 
@@ -334,6 +342,10 @@ class DefaultController extends Controller
 
     private function checkIsMonthCompleted($id, $year, $month)
     {
+        $userRoles = Yii::$app->authManager->getRolesByUser($id);
+        if ($userRoles['instructor']) return;
+
+
         if ($id && $year && $month) {
             $attendances = Attendance::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
                 [':year' => $year, ':month' => $month, ':userId' => \Yii::$app->user->id])->orderBy('date')->all();
@@ -569,15 +581,16 @@ class DefaultController extends Controller
     {
         $auth = \Yii::$app->authManager;
         $dep_admin = $auth->getRole('dep_admin');
-        $auth->assign($dep_admin,$id);
+        $auth->assign($dep_admin, $id);
 
         return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
     }
- public function actionRemoveDepAdmin($id)
+
+    public function actionRemoveDepAdmin($id)
     {
         $auth = \Yii::$app->authManager;
         $dep_admin = $auth->getRole('dep_admin');
-        $auth->revoke($dep_admin,$id);
+        $auth->revoke($dep_admin, $id);
 
         return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
     }
