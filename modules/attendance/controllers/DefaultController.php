@@ -59,12 +59,17 @@ class DefaultController extends Controller
 
     public function actionIndex($id = null)
     {
-        \Yii::$app->assetManager->forceCopy = true;
-        AttendanceAsset::register($this->getView());
-
         if ($id === null) {
             $id = \Yii::$app->user->id;
         }
+        if (!$this->hasRight($id)) {
+            throw new HttpException(403, 'Nincs jogosultsága az oldal megtekintéséhez!');
+        }
+
+
+        \Yii::$app->assetManager->forceCopy = true;
+        AttendanceAsset::register($this->getView());
+
 
         $user = User::findOne($id);
 
@@ -77,6 +82,10 @@ class DefaultController extends Controller
 
     public function actionGetAttendances($id, $year, $month)
     {
+        if (!$this->hasRight($id)) {
+            throw new HttpException(403, 'Nincs jogosultsága az oldal megtekintéséhez!');
+        }
+
         $data = [];
         $redLetterDays = RedLetterDay::find()->where('YEAR(date)=:year AND MONTH(date)=:month',
             [':year' => $year, ':month' => $month])->all();
@@ -132,6 +141,10 @@ class DefaultController extends Controller
 
     public function actionSaveAttendances($id)
     {
+        if (!$this->hasRight($id)) {
+            throw new HttpException(403, 'Nincs jogosultsága az oldal megtekintéséhez!');
+        }
+
         $json = file_get_contents("php://input");
         $attendances = Json::decode($json);
 
@@ -215,6 +228,10 @@ class DefaultController extends Controller
 
     public function actionSetAbsence($id)
     {
+        if (!$this->hasRight($id)) {
+            throw new HttpException(403, 'Nincs jogosultsága az oldal megtekintéséhez!');
+        }
+
         $json = file_get_contents("php://input");
         $data = Json::decode($json);
         if (is_array($data)) {
@@ -262,6 +279,10 @@ class DefaultController extends Controller
 
     public function actionRemoveAbsence($id)
     {
+        if (!$this->hasRight($id)) {
+            throw new HttpException(403, 'Nincs jogosultsága az oldal megtekintéséhez!');
+        }
+
         $json = file_get_contents("php://input");
         $data = Json::decode($json);
         if (is_array($data) && isset($data['date'])) {
@@ -533,27 +554,33 @@ class DefaultController extends Controller
         return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
     }
 
-    public function actionSetInstructorAttendance($year, $month, $value)
+    public function actionSetInstructorAttendance($id=null, $year, $month, $value)
     {
-//        TODO: Authorization
+        if ($id === null) {
+            $id = \Yii::$app->user->id;
+        }
 
-        $user = User::findOne(\Yii::$app->user->id);
+        if (!$this->hasRight($id)) {
+            throw new HttpException(403, 'Nincs jogosultsága az oldal megtekintéséhez!');
+        }
+
+        $user = User::findOne($id);
 
         if (strtolower($value) == 'false') {
             Completion::deleteAll('year=:year AND month=:month AND user_id=:user_id', [
                 ':year'    => $year,
                 ':month'   => $month,
-                ':user_id' => \Yii::$app->user->id,
+                ':user_id' => $id,
             ]);
         } else {
             $completion = Completion::find()->where('year=:year AND month=:month AND user_id=:user_id', [
                 ':year'    => $year,
                 ':month'   => $month,
-                ':user_id' => \Yii::$app->user->id,
+                ':user_id' => $id,
             ])->one();
             if (!$completion) {
                 $completion = new Completion();
-                $completion->user_id = \Yii::$app->user->id;
+                $completion->user_id = $id;
                 $completion->year = $year;
                 $completion->month = $month;
                 $completion->save();
@@ -562,16 +589,22 @@ class DefaultController extends Controller
 
     }
 
-    public function actionGetInstructorAttendance($year, $month)
+    public function actionGetInstructorAttendance($id=null, $year, $month)
     {
-//        TODO: Authorization
+        if ($id === null) {
+            $id = \Yii::$app->user->id;
+        }
 
-        $user = User::findOne(\Yii::$app->user->id);
+        if (!$this->hasRight($id)) {
+            throw new HttpException(403, 'Nincs jogosultsága az oldal megtekintéséhez!');
+        }
+
+        $user = User::findOne($id);
 
         $completion = Completion::find()->where('year=:year AND month=:month AND user_id=:user_id', [
             ':year'    => $year,
             ':month'   => $month,
-            ':user_id' => \Yii::$app->user->id,
+            ':user_id' => $id,
         ])->one();
 
         return Json::encode(['value' => $completion !== null]);
@@ -596,4 +629,16 @@ class DefaultController extends Controller
         return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
     }
 
+    public function hasRight($userId)
+    {
+        if ($userId !== null) {
+            if ($userId==Yii::$app->user->id) return true;
+
+            return Yii::$app->user->can('admin') ||
+            Yii::$app->user->can('dep_admin') ||
+            Yii::$app->user->can('dep_leader') ||
+            Yii::$app->user->can('payroll_manager');
+        }
+        return true;
+    }
 }
