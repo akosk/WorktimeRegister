@@ -68,13 +68,14 @@ echo AlertBlock::widget([
 
 
                     <?php if ($closeMonth->attendances_closed != 1) { ?>
-                        <button id='attendances-close-btn' class="btn btn-danger">Jelenlétek zárolása</button>
+                        <button <?= $canClose ?> id='attendances-close-btn' class="btn btn-danger">Jelenlétek
+                        zárolása</button>
                     <?php } else { ?>
                         <span class="btn disabled"><i class="fa fa-lock" role="alert"></i> A jelenlétek zárolva.</span>
                     <?php } ?>
 
                     <?php if ($closeMonth->absences_closed != 1) { ?>
-                        <button id='absences-close-btn' class="btn btn-danger"
+                        <button <?= $canClose ?> id='absences-close-btn' class="btn btn-danger"
                             >Távollétek zárolása
                         </button>
                     <?php } else { ?>
@@ -125,14 +126,14 @@ echo AlertBlock::widget([
                         'format'    => 'raw',
                     ],
                     [
-                        'class'    => 'yii\grid\ActionColumn',
-                        'contentOptions'  => [
+                        'class'          => 'yii\grid\ActionColumn',
+                        'contentOptions' => [
                             'style' => 'min-width:80px'
                         ],
-                        'template' => '{add-dep-admin} {remove-dep-admin} {index}',
-                        'buttons'  => [
+                        'template'       => '{add-dep-admin} {remove-dep-admin} {index}',
+                        'buttons'        => [
                             'add-dep-admin'    => function ($url, $model) {
-                                $roles=Yii::$app->authManager->getAssignments($model->id);
+                                $roles = Yii::$app->authManager->getAssignments($model->id);
                                 if (!(Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader'))) return '';
                                 if (is_array($roles) && $roles['dep_admin']) return '';
                                 return Html::a('<i class="glyphicon glyphicon-user"></i>', $url, [
@@ -143,21 +144,21 @@ echo AlertBlock::widget([
                             },
                             'remove-dep-admin' => function ($url, $model) {
                                 if (!(Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader'))) return '';
-                                $roles=Yii::$app->authManager->getAssignments($model->id);
+                                $roles = Yii::$app->authManager->getAssignments($model->id);
                                 if (is_array($roles) && !$roles['dep_admin']) return '';
                                 return Html::a('<i class="glyphicon glyphicon-user"></i>', $url, [
-                                    'class'        => 'btn btn-xs btn-danger',
+                                    'class' => 'btn btn-xs btn-danger',
                                     'title' => Yii::t('yii',
                                         'Szervezeti egység adminisztrátor szerepkör eltávolítás'),
                                 ]);
                             },
-                            'index' => function ($url, $model) {
-                                $roles=Yii::$app->authManager->getAssignments($model->id);
+                            'index'            => function ($url, $model) {
+                                $roles = Yii::$app->authManager->getAssignments($model->id);
 //                                if (is_array($roles) && !$roles['dep_admin']) return '';
                                 return Html::a('<i class="glyphicon glyphicon-eye-open"></i>', $url, [
-                                    'class'        => 'btn btn-xs btn-info',
+                                    'class' => 'btn btn-xs btn-info',
                                     'title' => Yii::t('yii',
-                                        $model->profile->name.' jelenléti ívének megtekintése'),
+                                        $model->profile->name . ' jelenléti ívének megtekintése'),
                                 ]);
                             },
                         ]

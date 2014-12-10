@@ -4,7 +4,7 @@
 
 /*jshint loopfunc: true */
 /*global    isAdmin: true, isPayrollManager: true, isInstructor:true, isDepLeader:true, isDepAdmin:true,
-            userId: true */
+ userId: true, editDisabled: true */
 
 var attendanceModule;
 
@@ -60,6 +60,7 @@ var attendanceModule;
          $scope.isPayrollManager = isPayrollManager;
          $scope.helpers = helpers;
          $scope.userId = userId;
+         $scope.editDisabled = editDisabled;
 
 
          $scope.$watch('instructorAttendance', function (newData, oldData) {

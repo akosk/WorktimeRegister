@@ -69,7 +69,7 @@ class DefaultController extends Controller
         $user = User::findOne($id);
 
         return $this->render('index', [
-            'user' => $user,
+            'user'      => $user,
             'userRoles' => Yii::$app->authManager->getRolesByUser($id)
         ]);
     }
@@ -240,7 +240,7 @@ class DefaultController extends Controller
             }
             $absence->code = $data['code'];
             $absence->create_time = new \yii\db\Expression('NOW()');
-            $absence->create_user =\Yii::$app->user->id;
+            $absence->create_user = \Yii::$app->user->id;
             $absence->save();
 
             $dtime = DateTime::createFromFormat("Y-m-d", $data['date']);
@@ -330,6 +330,7 @@ class DefaultController extends Controller
             'prevMonth'         => $month == 1 ? 12 : $month - 1,
             'hasIncompleteUser' => $hasIncompleteUser,
             'closeMonth'        => $closeMonth,
+            'canClose'          => Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ? '' : 'disabled',
         ]);
 
     }

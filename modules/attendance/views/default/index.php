@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="panel-body">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" ng-model="instructorAttendance"> {{year}}. {{helpers
+                        <input ng-disabled="editDisabled" type="checkbox" ng-model="instructorAttendance"> {{year}}. {{helpers
                         .getMonthName
                         (month)}}
                         hónapban a
@@ -80,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                    ng-focus="setFocusedItem(a)"
                                    ng-blur="unsetFocusedItem(a)"
                                    placeholder="Érkezés ideje"
-                                   ng-disabled="ourData.isAttendancesClosed()"
+                                   ng-disabled="ourData.isAttendancesClosed() || editDisabled"
                                    ng-class="helpers.isCurrentDay(a.date)
                                              && a.from===null
                                              ? 'focused' : '' ">
@@ -95,7 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                    ng-focus="setFocusedItem(a)"
                                    ng-blur="unsetFocusedItem(a)"
                                    placeholder="Távozás ideje"
-                                   ng-disabled="ourData.isAttendancesClosed()"
+                                   ng-disabled="ourData.isAttendancesClosed() || editDisabled"
                                    ng-class="helpers.isCurrentDay(a.date)
                                              && a.from!==null
                                              && a.to===null
@@ -114,7 +114,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         <td>
                             <div class="btn-group" ng-show="a.userWorkDay">
-                                <button ng-show="!ourData.isAbsencesClosed()" type="button" class="btn
+                                <button ng-show="!ourData.isAbsencesClosed() && !editDisabled" type="button" class="btn
                                 btn-success btn-xs dropdown-toggle"
                                         data-toggle="dropdown" aria-expanded="false">
                                     <i class="fa fa-calendar fa-2x"></i>
@@ -146,7 +146,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                                     <span ng-show="((!isUserOnFreeDay(a) && ((a.from!==null) || (a.to!==null))) ||
-                                    a.userAbsence!==undefined) && !ourData.isAttendancesClosed()"
+                                    a.userAbsence!==undefined) && !ourData.isAttendancesClosed() && !editDisabled"
                                           ng-click="clearTimes(a)"
                                           class="btn btn-danger btn-xs"
                                           href="#" title="Töröl">
@@ -231,4 +231,6 @@ $this->params['breadcrumbs'][] = $this->title;
     var isDepAdmin = <?=\Yii::$app->user->can('dep_admin') ? 'true':'false' ?>;
     var isPayrollManager = <?=\Yii::$app->user->can('payroll_manager') ? 'true':'false' ?>;
     var userId =<?= $user->id?>;
+    var editDisabled =
+    <?=\Yii::$app->user->can('payroll_manager') && $user->id!=Yii::$app->user->id ? 'true':'false' ?>;
 </script>
