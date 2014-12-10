@@ -64,9 +64,17 @@ class UserSearch extends \app\models\User
         $query->joinWith(['profile']);
         $query->joinWith(['currentCompletions']);
 
-        User::$yearFilter=$this->year;
-        User::$monthFilter=$this->month;
+        User::$yearFilter = $this->year;
+        User::$monthFilter = $this->month;
 
+        if (!(Yii::$app->user->can('admin') || Yii::$app->user->can('payroll_manager'))) {
+            $currentUser = User::findOne(\Yii::$app->user->id);
+            $query->andFilterWhere([
+                '=',
+                'profile.department_id',
+                $currentUser->profile->department_id
+            ]);
+        }
 
         $dataProvider->sort->attributes['profile.name'] = [
             'asc'  => ['profile.name' => SORT_ASC],
@@ -81,6 +89,7 @@ class UserSearch extends \app\models\User
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }
+
 
         $query->andFilterWhere([
             'like',
