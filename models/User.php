@@ -93,9 +93,10 @@ INNER JOIN profile p ON p.taxnumber=t.taxnumber $where";
             if ($res[$i]['admin'] == 1) {
                 $this->assignRole($dep_leader, $res[$i]['user_id']);
             } else {
-                $auth->revoke($worker, $res[$i]['user_id']);
+                $auth->revoke($dep_leader, $res[$i]['user_id']);
             }
         }
+
     }
 
     protected function assignRole(Role $role, $user_id)
