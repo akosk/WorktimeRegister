@@ -133,6 +133,7 @@ echo AlertBlock::widget([
                         'buttons'  => [
                             'add-dep-admin'    => function ($url, $model) {
                                 $roles=Yii::$app->authManager->getAssignments($model->id);
+                                if (!(Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader'))) return '';
                                 if (is_array($roles) && $roles['dep_admin']) return '';
                                 return Html::a('<i class="glyphicon glyphicon-user"></i>', $url, [
                                     'class' => 'btn btn-xs btn-info',
@@ -141,6 +142,7 @@ echo AlertBlock::widget([
                                 ]);
                             },
                             'remove-dep-admin' => function ($url, $model) {
+                                if (!(Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader'))) return '';
                                 $roles=Yii::$app->authManager->getAssignments($model->id);
                                 if (is_array($roles) && !$roles['dep_admin']) return '';
                                 return Html::a('<i class="glyphicon glyphicon-user"></i>', $url, [
