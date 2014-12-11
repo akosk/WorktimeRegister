@@ -14,7 +14,15 @@ class AttendanceAsset extends AssetBundle
     public $sourcePath = '@app/modules/attendance/assets';
     public $css = ['css/attendance.css'];
     public $js = [
-        'js/attendance.js', 'js/directives.js', 'js/factories.js', 'js/filters.js'
+        'js/attendance.module.js',
+        'js/attendance.config.js',
+        'js/attendanceController.js',
+        'js/directives/akTimeMask.js',
+        'js/directives/emptyToNull.js',
+        'js/directives/focusTime.js',
+        'js/factories/dataService.js',
+        'js/factories/helpers.js',
+        'js/filters/justDay.js'
     ];
     public $depends = [
         'yii\web\JqueryAsset',

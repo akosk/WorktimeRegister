@@ -7,11 +7,14 @@
 (function () {
    "use strict";
 
-   attendanceModule.filter('justDay', function (helpers) {
+   angular.module('attendance')
+      .filter('justDay', justDay);
+
+   function justDay(helpers) {
       return function (input) {
          var date = new Date(input);
 
          return date.getDate() + ". " + helpers.DAY_NAMES[date.getDay()];
       };
-   });
+   }
 })();
