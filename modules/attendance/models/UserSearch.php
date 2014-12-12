@@ -29,7 +29,7 @@ class UserSearch extends \app\models\User
     public function rules()
     {
         return [
-            [['username', 'email', 'profile.name'], 'safe'],
+            [['username', 'email', 'profile.name','profile.taxnumber','profile.department.name'], 'safe'],
         ];
     }
 
@@ -43,7 +43,7 @@ class UserSearch extends \app\models\User
 
     public function attributes()
     {
-        return array_merge(parent::attributes(), ['profile.name']);
+        return array_merge(parent::attributes(), ['profile.name', 'profile.taxnumber','profile.department.name']);
     }
 
     /**
@@ -63,6 +63,7 @@ class UserSearch extends \app\models\User
 
         $query->joinWith(['profile']);
         $query->joinWith(['currentCompletions']);
+        $query->joinWith(['profile.department']);
 
         User::$yearFilter = $this->year;
         User::$monthFilter = $this->month;
@@ -84,6 +85,14 @@ class UserSearch extends \app\models\User
             'asc'  => ['completion.id' => SORT_ASC],
             'desc' => ['completion.id' => SORT_DESC],
         ];
+        $dataProvider->sort->attributes['profile.taxnumber'] = [
+            'asc'  => ['profile.taxnumber' => SORT_ASC],
+            'desc' => ['profile.taxnumber' => SORT_DESC],
+        ];
+        $dataProvider->sort->attributes['profile.department.name'] = [
+            'asc'  => ['department.name' => SORT_ASC],
+            'desc' => ['department.name' => SORT_DESC],
+        ];
 
 
         if (!($this->load($params) && $this->validate())) {
@@ -100,6 +109,18 @@ class UserSearch extends \app\models\User
             'like',
             'profile.name',
             $this->attributes["profile.name"],
+            $this->attributes["currentCompletions.id"],
+        ]);
+        $query->andFilterWhere([
+            'like',
+            'profile.taxnumber',
+            $this->attributes["profile.taxnumber"],
+            $this->attributes["currentCompletions.id"],
+        ]);
+        $query->andFilterWhere([
+            'like',
+            'department.name',
+            $this->attributes['profile.department.name'],
             $this->attributes["currentCompletions.id"],
         ]);
 
