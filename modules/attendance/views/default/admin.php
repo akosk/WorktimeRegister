@@ -147,7 +147,8 @@ echo AlertBlock::widget([
                             },
                             'index'            => function ($url, $model) {
                                 $roles = Yii::$app->authManager->getAssignments($model->id);
-//                                if (is_array($roles) && !$roles['dep_admin']) return '';
+                                $url.="#/year/".(app\models\User::$yearFilter)."/month/".
+                                    (app\models\User::$monthFilter);
                                 return Html::a('<i class="glyphicon glyphicon-eye-open"></i>', $url, [
                                     'class' => 'btn btn-xs btn-info',
                                     'title' => Yii::t('yii',
