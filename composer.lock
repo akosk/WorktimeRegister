@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4df27bd01531441c6cf0e4e19634c490",
+    "hash": "816db904d2e487494e124061fd80cc85",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -831,6 +831,49 @@
             "time": "2014-05-12 11:40:04"
         },
         {
+            "name": "kartik-v/mpdf",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/mpdf.git",
+                "reference": "46148a9d43b88f3832f6bc348b6a55d9a482187f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/mpdf/zipball/46148a9d43b88f3832f6bc348b6a55d9a482187f",
+                "reference": "46148a9d43b88f3832f6bc348b6a55d9a482187f",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=4.3.10"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "mpdf.php",
+                    "classes"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-1.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Ian N Back"
+                }
+            ],
+            "description": "A PHP class to generate PDF files from HTML with Unicode/UTF-8 and CJK support. This is a fork of the official mPDF library.",
+            "homepage": "http://www.mpdf1.com/mpdf/index.php",
+            "keywords": [
+                "pdf",
+                "php",
+                "utf-8"
+            ],
+            "time": "2014-11-08 13:41:48"
+        },
+        {
             "name": "kartik-v/yii2-builder",
             "version": "dev-master",
             "source": {
@@ -966,6 +1009,53 @@
                 "yii2"
             ],
             "time": "2014-11-14 19:10:10"
+        },
+        {
+            "name": "kartik-v/yii2-mpdf",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-mpdf.git",
+                "reference": "4478a52f3163b63be1bbb16299986b65b610188e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-mpdf/zipball/4478a52f3163b63be1bbb16299986b65b610188e",
+                "reference": "4478a52f3163b63be1bbb16299986b65b610188e",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/mpdf": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "kartik\\mpdf\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD 3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "A Yii2 wrapper component for the mPDF library which generates PDF files from UTF-8 encoded HTML.",
+            "homepage": "https://github.com/kartik-v/yii2-mpdf",
+            "keywords": [
+                "component",
+                "extension",
+                "html",
+                "mpdf",
+                "pdf",
+                "utf8",
+                "yii2"
+            ],
+            "time": "2014-11-10 18:12:05"
         },
         {
             "name": "kartik-v/yii2-widget-activeform",
@@ -2893,7 +2983,8 @@
         "kartik-v/yii2-widgets": 20,
         "kartik-v/yii2-builder": 20,
         "php-excel-reader/spreadsheet-reader": 20,
-        "os/php-excel": 20
+        "os/php-excel": 20,
+        "kartik-v/yii2-mpdf": 20
     },
     "prefer-stable": false,
     "platform": {

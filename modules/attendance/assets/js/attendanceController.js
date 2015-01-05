@@ -218,6 +218,21 @@
 
       };
 
+      $scope.getReportUrl = function (action) {
+
+         var params = {
+            'user_id': $scope.userId,
+            'year'   : 2012,
+            'month'  : 12
+         };
+
+         params = _.map(params, function (value, key, list) {
+            return key + "=" + value;
+         }).join('&');
+
+         return BASE_URL + "attendance/default/" + action + "?" + params;
+      };
+
       $scope.setAbsence = function (item, absenceType) {
          $scope.focusedItem = item;
          $scope.isSave = true;
