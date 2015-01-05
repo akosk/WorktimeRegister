@@ -351,7 +351,8 @@ class DefaultController extends Controller
             'prevMonth'         => $month == 1 ? 12 : $month - 1,
             'hasIncompleteUser' => $hasIncompleteUser,
             'closeMonth'        => $closeMonth,
-            'canClose'          => Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ? '' : 'disabled',
+            'canClose'          => Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
+            Yii::$app->user->can('dep_admin') ? '' : 'disabled',
         ]);
 
     }
