@@ -22,8 +22,8 @@ class AdminController extends BaseAdminController
     public function behaviors()
     {
         return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
+            'verbs'  => [
+                'class'   => VerbFilter::className(),
                 'actions' => [
                     'delete'  => ['post'],
                     'confirm' => ['post'],
@@ -35,12 +35,37 @@ class AdminController extends BaseAdminController
                 'rules' => [
                     [
                         'actions' => ['index', 'create', 'update', 'delete', 'block', 'confirm'],
-                        'allow' => true,
-                        'roles' => ['admin'],
+                        'allow'   => true,
+                        'roles'   => ['admin'],
                     ],
                 ]
             ]
         ];
+    }
+
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+        $model->scenario = 'update';
+
+        if ($model->load(\Yii::$app->request->post()) && $model->save()) {
+            \Yii::$app->getSession()->setFlash('user.success', \Yii::t('user', 'User has been updated'));
+            return $this->refresh();
+        }
+
+
+        $roles = \Yii::$app->authManager->getRoles();
+        $translatedRoles = [];
+        foreach ($roles as $role) {
+            $trans=Yii::t('app',$role->name);
+            $translatedRoles[$trans]=$trans;
+        }
+
+
+        return $this->render('update', [
+            'model'           => $model,
+            'translatedRoles' => $translatedRoles
+        ]);
     }
 
 

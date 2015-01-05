@@ -70,9 +70,9 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php
             echo Select2::widget([
                 'name'    => 'roles',
-                'data'    => \yii\helpers\ArrayHelper::map(\Yii::$app->authManager->getRoles(), 'name', 'name'),
+                'data'    => $translatedRoles,
                 'value'   => array_map(function ($role) {
-                    return $role->name;
+                    return Yii::t('app',$role->name);
                 }, \Yii::$app->authManager->getRolesByUser($model->id)),
                 'options' => [
                     'placeholder' => 'Válasszon szerepkört ...',

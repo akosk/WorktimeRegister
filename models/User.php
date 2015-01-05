@@ -10,6 +10,7 @@ namespace app\models;
 use app\modules\attendance\models\Completion;
 use dektrium\user\models\User as BaseUser;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\rbac\Role;
 
 class User extends BaseUser
@@ -30,12 +31,24 @@ class User extends BaseUser
     {
         $auth = \Yii::$app->authManager;
         $auth->revokeAll($this->id);
-        foreach ($newRoles as $role) {
+        foreach ($newRoles as $untranslatedRoleName) {
+            $role=$this->translate($untranslatedRoleName);
             $authRole = $auth->getRole($role);
             if ($authRole) {
                 $auth->assign($authRole, $this->id);
             }
         }
+    }
+
+    private function translate($s) {
+        $arr=ArrayHelper::map(
+            \Yii::$app->authManager->getRoles(),
+            function ($role){
+                return Yii::t('app', $role->name);
+            },
+            'name'
+        );
+        return $arr[$s];
     }
 
     public function getCompletions()
