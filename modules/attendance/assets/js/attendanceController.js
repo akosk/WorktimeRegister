@@ -222,8 +222,8 @@
 
          var params = {
             'user_id': $scope.userId,
-            'year'   : 2012,
-            'month'  : 12
+            'year'   : $scope.year,
+            'month'  : $scope.month
          };
 
          params = _.map(params, function (value, key, list) {

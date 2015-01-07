@@ -48,7 +48,8 @@ class DefaultController extends Controller
                         'actions' => ['index', 'get-attendances', 'save-attendances', 'set-red-letter-day',
                             'set-absence', 'remove-absence', 'admin', 'import', 'close',
                             'set-instructor-attendance', 'get-instructor-attendance',
-                            'add-dep-admin', 'remove-dep-admin', 'report-attendance'],
+                            'add-dep-admin', 'remove-dep-admin',
+                            'report-attendance', 'report-holiday', 'report-absence'],
                         'allow'   => true,
                         'roles'   => ['@'],
                     ],
@@ -86,55 +87,7 @@ class DefaultController extends Controller
             throw new HttpException(403, 'Nincs jogosultsága az oldal megtekintéséhez!');
         }
 
-        $data = [];
-        $redLetterDays = RedLetterDay::find()->where('YEAR(date)=:year AND MONTH(date)=:month',
-            [':year' => $year, ':month' => $month])->all();
-
-        foreach ($redLetterDays as $item) {
-            $data['attendances'][$item->date] = [
-                'date'        => $item->date,
-                'from'        => null,
-                'to'          => null,
-                'workDay'     => $item->type == RedLetterDay::WORKING_DAY,
-                'userWorkDay' => $item->type == RedLetterDay::WORKING_DAY,
-            ];
-        }
-
-        $absences = Absence::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
-            [':year' => $year, ':month' => $month, ':userId' => $id])->all();
-
-        foreach ($absences as $item) {
-            $data['attendances'][$item->date] = ArrayHelper::merge($data['attendances'][$item->date], [
-                'date'            => $item->date,
-                'from'            => null,
-                'to'              => null,
-                'userWorkDay'     => false,
-                'userAbsenceCode' => $item->code
-            ]);
-        }
-
-        $attendances = Attendance::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
-            [':year' => $year, ':month' => $month, ':userId' => $id])->all();
-
-
-        foreach ($attendances AS $item) {
-            $data['attendances'][$item->date] = ArrayHelper::merge($data['attendances'][$item->date], [
-                'date' => $item->date,
-                'from' => $item->start ? date("H:i", strtotime($item->start)) : null,
-                'to'   => $item->end ? date("H:i", strtotime($item->end)) : null
-            ]);
-        }
-
-
-        if (isset($data['attendances'])) {
-            $data['attendances'] = array_values($data['attendances']);
-        }
-
-        $currentUser = User::findOne($id);
-
-        $data['absences_closed'] = CloseMonth::isAbsencesClosed($year, $month, $currentUser->profile->department->id);
-        $data['attendances_closed'] = CloseMonth::isAttendancesClosed($year, $month,
-            $currentUser->profile->department->id);
+        $data = $this->getAttendances($id, $year, $month);
 
         echo Json::encode($data);
     }
@@ -337,6 +290,18 @@ class DefaultController extends Controller
         FontawesomeAsset::register($this->getView());
         BootstrapSweetAlertAsset::register($this->getView());
 
+        $holidayReportUrl = Url::to(ArrayHelper::merge(
+            [
+                '/attendance/default/report-holiday',
+                'year'  => $year,
+                'month' => $month
+            ], $_GET));
+        $absenceReportUrl = Url::to(ArrayHelper::merge([
+            '/attendance/default/report-absence',
+            'year'  => $year,
+            'month' => $month
+
+        ], $_GET));
 
         return $this->render('admin', [
             'dataProvider'      => $dataProvider,
@@ -353,6 +318,8 @@ class DefaultController extends Controller
             'closeMonth'        => $closeMonth,
             'canClose'          => Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
             Yii::$app->user->can('dep_admin') ? '' : 'disabled',
+            'holidayReportUrl'  => $holidayReportUrl,
+            'absenceReportUrl'  => $absenceReportUrl
         ]);
 
     }
@@ -555,7 +522,7 @@ class DefaultController extends Controller
         return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
     }
 
-    public function actionSetInstructorAttendance($id=null, $year, $month, $value)
+    public function actionSetInstructorAttendance($id = null, $year, $month, $value)
     {
         if ($id === null) {
             $id = \Yii::$app->user->id;
@@ -590,7 +557,7 @@ class DefaultController extends Controller
 
     }
 
-    public function actionGetInstructorAttendance($id=null, $year, $month)
+    public function actionGetInstructorAttendance($id = null, $year, $month)
     {
         if ($id === null) {
             $id = \Yii::$app->user->id;
@@ -632,43 +599,64 @@ class DefaultController extends Controller
 
     public function actionReportAttendance($user_id, $year, $month)
     {
-        $content = $this->renderPartial('_report-attendance');
 
-        // setup kartik\mpdf\Pdf component
-        $pdf = new Pdf([
-            // set to use core fonts only
-            'filename'=>'jelenlet.pdf',
-            'mode' => Pdf::MODE_UTF8,
-            // A4 paper format
-            'format' => Pdf::FORMAT_A4,
-            // portrait orientation
-            'orientation' => Pdf::ORIENT_PORTRAIT,
-            // stream to browser inline
-            'destination' => Pdf::DEST_DOWNLOAD,
-            // your html content input
-            'content' => $content,
-            // format content from your own css file if needed or use the
-            // enhanced bootstrap css built by Krajee for mPDF formatting
-            'cssFile' => '@vendor/kartik-v/yii2-mpdf/assets/kv-mpdf-bootstrap.min.css',
-            // any css to be embedded if required
-            'cssInline' => '.kv-heading-1{font-size:18px}',
-            // set mPDF properties on the fly
-            'options' => ['title' => 'Munkaidő nyilvántartó'],
-            // call mPDF methods on the fly
-            'methods' => [
-                'SetHeader'=>['Munkaidő nyilvántartó'],
-                'SetFooter'=>['{PAGENO}'],
-            ]
+        $user = User::findOne($user_id);
+
+        $data = $this->getReportData($user_id, $year, $month);
+
+
+        $content = $this->renderPartial('_report-attendance', [
+            'user'        => $user,
+            'year'        => $year,
+            'monthName'   => DateHelper::getMonthName($month),
+            'attendances' => $data
         ]);
 
-        // return the pdf output as per the destination setting
+        $pdf = $this->createPdf($content, 'jelenlet');
+
         return $pdf->render();
+    }
+
+    public function actionReportHoliday($year, $month)
+    {
+        $aggregatedAbsences = $this->getAbsenceReport($year, $month, true);
+
+        $content = $this->renderPartial('_report-holiday', [
+            'year'      => $year,
+            'monthName' => DateHelper::getMonthName($month),
+            'absences'  => $aggregatedAbsences
+        ]);
+
+        $pdf = $this->createPdf($content, 'szabadsag');
+
+        return $pdf->render();
+    }
+
+    public function actionReportAbsence($year, $month)
+    {
+        $aggregatedAbsences = $this->getAbsenceReport($year, $month, false);
+
+        $content = $this->renderPartial('_report-absence', [
+            'year'      => $year,
+            'monthName' => DateHelper::getMonthName($month),
+            'absences'  => $aggregatedAbsences
+        ]);
+
+        $pdf = $this->createPdf($content, 'tavollet');
+
+        return $pdf->render();
+    }
+
+    public function isContinous($absence, $row)
+    {
+        return intval(substr($absence['date_to'], -2)) + 1 == intval(substr($row['date'],
+            -2)) && $absence['code']==$row['code'];
     }
 
     public function hasRight($userId)
     {
         if ($userId !== null) {
-            if ($userId==Yii::$app->user->id) return true;
+            if ($userId == Yii::$app->user->id) return true;
 
             return Yii::$app->user->can('admin') ||
             Yii::$app->user->can('dep_admin') ||
@@ -676,5 +664,240 @@ class DefaultController extends Controller
             Yii::$app->user->can('payroll_manager');
         }
         return true;
+    }
+
+    /**
+     * @param $id
+     * @param $year
+     * @param $month
+     * @return array
+     */
+    public function getAttendances($id, $year, $month)
+    {
+        $data = [];
+        $redLetterDays = RedLetterDay::find()->where('YEAR(date)=:year AND MONTH(date)=:month',
+            [':year' => $year, ':month' => $month])->all();
+
+        foreach ($redLetterDays as $item) {
+            $data['attendances'][$item->date] = [
+                'date'        => $item->date,
+                'from'        => null,
+                'to'          => null,
+                'workDay'     => $item->type == RedLetterDay::WORKING_DAY,
+                'userWorkDay' => $item->type == RedLetterDay::WORKING_DAY,
+            ];
+        }
+
+        $absences = Absence::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
+            [':year' => $year, ':month' => $month, ':userId' => $id])->all();
+
+        foreach ($absences as $item) {
+            $data['attendances'][$item->date] = ArrayHelper::merge($data['attendances'][$item->date], [
+                'date'            => $item->date,
+                'from'            => null,
+                'to'              => null,
+                'userWorkDay'     => false,
+                'userAbsenceCode' => $item->code
+            ]);
+        }
+
+        $attendances = Attendance::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
+            [':year' => $year, ':month' => $month, ':userId' => $id])->all();
+
+
+        foreach ($attendances AS $item) {
+            $data['attendances'][$item->date] = ArrayHelper::merge($data['attendances'][$item->date], [
+                'date' => $item->date,
+                'from' => $item->start ? date("H:i", strtotime($item->start)) : null,
+                'to'   => $item->end ? date("H:i", strtotime($item->end)) : null
+            ]);
+        }
+
+
+        if (isset($data['attendances'])) {
+            $data['attendances'] = array_values($data['attendances']);
+        }
+
+        $currentUser = User::findOne($id);
+
+        $data['absences_closed'] = CloseMonth::isAbsencesClosed($year, $month, $currentUser->profile->department->id);
+        $data['attendances_closed'] = CloseMonth::isAttendancesClosed($year, $month,
+            $currentUser->profile->department->id);
+        return $data;
+    }
+
+    /**
+     * @param $year
+     * @param $month
+     * @param $iDay
+     * @param $data
+     * @return array
+     */
+    public function insertDate($year, $month, $iDay, &$data)
+    {
+        $m = $month < 10 ? '0' . $month : $month;
+        $d = $iDay < 10 ? '0' . $iDay : $iDay;
+        $dateStr = "$year-$m-$d";
+        $data[] = [
+            'date'        => $dateStr,
+            'userWorkDay' => !DateHelper::isWeekEnd($dateStr),
+            'weekend'     => DateHelper::isWeekEnd($dateStr)
+        ];
+    }
+
+    /**
+     * @param $user_id
+     * @param $year
+     * @param $month
+     * @return array
+     */
+    public function getReportData($user_id, $year, $month)
+    {
+        $data = $this->getAttendances($user_id, $year, $month);
+        $data = isset($data['attendances']) ? $data['attendances'] : [];
+        uasort($data, function ($a, $b) {
+            return $a['date'] < $b['date'] ? -1 : 1;
+        });
+
+
+        $days = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $iDay = 1;
+        foreach ($data as $item) {
+            $currentDay = intval(substr($item['date'], -2));
+            while ($currentDay > $iDay) {
+                $this->insertDate($year, $month, $iDay, $data);
+                $iDay++;
+            }
+            $iDay++;
+        }
+
+        for (; $iDay <= $days; $iDay++) {
+            $this->insertDate($year, $month, $iDay, $data);
+        }
+
+        uasort($data, function ($a, $b) {
+            return $a['date'] < $b['date'] ? -1 : 1;
+        });
+        return $data;
+    }
+
+    /**
+     * @param $content
+     * @return Pdf
+     */
+    public function createPdf($content, $filename)
+    {
+// setup kartik\mpdf\Pdf component
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'filename'    => $filename . '.pdf',
+            'mode'        => Pdf::MODE_UTF8,
+            // A4 paper format
+            'format'      => Pdf::FORMAT_A4,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_PORTRAIT,
+            // stream to browser inline
+            'destination' => Pdf::DEST_DOWNLOAD,
+            // your html content input
+            'content'     => $content,
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting
+            'cssFile'     => '@vendor/kartik-v/yii2-mpdf/assets/kv-mpdf-bootstrap.min.css',
+            // any css to be embedded if required
+            'cssInline'   => '.kv-heading-1{font-size:18px}',
+            // set mPDF properties on the fly
+            'options'     => ['title' => 'Munkaidő nyilvántartó'],
+            // call mPDF methods on the fly
+            'methods'     => [
+                'SetHeader' => ['Munkaidő nyilvántartó'],
+                'SetFooter' => ['{PAGENO}'],
+            ]
+        ]);
+        return $pdf;
+    }
+
+    /**
+     * @param $year
+     * @param $month
+     * @return array
+     */
+    public function getAbsenceReport($year, $month, $holidays=false)
+    {
+        $holidaysOrNotSql='';
+        if ($holidays) {
+            $holidaysOrNotSql=' IN ';
+        } else {
+            $holidaysOrNotSql=' NOT IN ';
+        }
+
+        $filters = [];
+        $params = [
+            ":year"  => $year,
+            ":month" => $month
+        ];
+
+        if (isset($_GET['UserSearch'])) {
+            $userSearch = $_GET['UserSearch'];
+            if ($userSearch['username'] != '') {
+                $params[':username'] = '%' . $userSearch['username'] . '%';
+                $filters[] = 'u.username LIKE :username';
+            }
+            if ($userSearch['profile.name'] != '') {
+                $params[':name'] = '%' . $userSearch['profile.name'] . '%';
+                $filters[] = 'p.name LIKE :name';
+            }
+            if ($userSearch['profile.taxnumber'] != '') {
+                $params[':taxnumber'] = '%' . $userSearch['profile.taxnumber'] . '%';
+                $filters[] = 'p.taxnumber LIKE :taxnumber';
+            }
+            if ($userSearch['profile.department.name'] != '') {
+                $params[':dep_name'] = '%' . $userSearch['profile.department.name'] . '%';
+                $filters[] = 'd.name LIKE :dep_name';
+            }
+        }
+
+        $filters = implode(' AND ', $filters);
+        if (strlen($filters) > 0) $filters = ' AND ' . $filters;
+
+
+        $q = "
+            SELECT t.code, t.user_id, t.date, p.name, p.taxnumber, d.name AS department_name
+            FROM absence t
+            INNER JOIN user u ON u.id=t.user_id
+            INNER JOIN profile p ON p.user_id=t.user_id
+            INNER JOIN department d ON p.department_id=d.id
+            WHERE t.code {$holidaysOrNotSql} ('91001', '91003', '91004', '91011')
+              AND YEAR(t.date)=:year AND MONTH(t.date)=:month
+              {$filters}
+            ORDER BY t.user_id, t.date
+        ";
+
+        $absences = Yii::$app->db->createCommand($q, $params)->queryAll();
+        $aggregatedAbsences = [];
+        $currentAbsence = null;
+        foreach ($absences as $row) {
+            if ($this->isContinous($currentAbsence, $row)) {
+                $currentAbsence['date_to'] = $row['date'];
+                $currentAbsence['days'] = $currentAbsence['days'] + 1;
+            } else {
+                if ($currentAbsence) {
+                    $aggregatedAbsences[] = $currentAbsence;
+                }
+                $currentAbsence = [
+                    'code'            => $row['code'],
+                    'name'            => $row['name'],
+                    'taxnumber'       => $row['taxnumber'],
+                    'department_name' => $row['department_name'],
+                    'date_from'       => $row['date'],
+                    'date_to'         => $row['date'],
+                    'days'            => 1,
+                ];
+            }
+        }
+        if ($currentAbsence) {
+            $aggregatedAbsences[] = $currentAbsence;
+            return $aggregatedAbsences;
+        }
+        return $aggregatedAbsences;
     }
 }

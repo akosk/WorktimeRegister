@@ -18,6 +18,21 @@ use Yii;
  */
 class Absence extends \yii\db\ActiveRecord
 {
+    public static $ABSENCES = [
+        '25004' => 'TERHESSÉGI GYERMEKÁGYI SEGÉLY',
+        '25005' => 'GYERMEKGONDOZÁSI DÍJ',
+        '25008' => 'TÁPPÉNZ, EGYÉB KERESŐKÉPTELENSÉG',
+        '26002' => 'APÁKAT MEGILLETŐ MUNKAIDŐKEDVEZMÉNY',
+        '91001' => 'RENDES SZABADSÁG',
+        '91003' => 'TANULMÁNYI SZABADSÁG ILLETMÉNNYEL',
+        '91004' => 'FIZETÉS NÉLKÜLI SZABADSÁG',
+        '91009' => 'GYERMEKGONDOZÁSI SEGÉLY',
+        '91011' => 'RENDKÍVÜLI SZABADSÁG',
+        '93001' => 'IGAZOLATLAN TÁVOLLÉT',
+        '93009' => 'FELMENTÉSI IDŐ',
+        '93026' => 'IGAZOLT TÁVOLLÉT'
+    ];
+
     /**
      * @inheritdoc
      */
@@ -45,10 +60,10 @@ class Absence extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('attendance', 'ID'),
-            'code' => Yii::t('attendance', 'Code'),
-            'user_id' => Yii::t('attendance', 'User ID'),
-            'date' => Yii::t('attendance', 'Date'),
+            'id'          => Yii::t('attendance', 'ID'),
+            'code'        => Yii::t('attendance', 'Code'),
+            'user_id'     => Yii::t('attendance', 'User ID'),
+            'date'        => Yii::t('attendance', 'Date'),
             'create_time' => Yii::t('attendance', 'Create Time'),
             'create_user' => Yii::t('attendance', 'Create User'),
         ];

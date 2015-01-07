@@ -62,7 +62,8 @@ echo AlertBlock::widget([
 
                     <?php if ($closeMonth->attendances_closed != 1) { ?>
                         <button <?= $canClose ?> id='attendances-close-btn' class="btn btn-danger">Jelenlétek
-                        zárolása</button>
+                            zárolása
+                        </button>
                     <?php } else { ?>
                         <span class="btn disabled"><i class="fa fa-lock" role="alert"></i> A jelenlétek zárolva.</span>
                     <?php } ?>
@@ -86,7 +87,6 @@ echo AlertBlock::widget([
             <?= "{$year}. {$monthName}" ?>
         </div>
         <div class="panel-body">
-
             <?php
             echo GridView::widget([
                 'dataProvider' => $dataProvider,
@@ -147,7 +147,7 @@ echo AlertBlock::widget([
                             },
                             'index'            => function ($url, $model) {
                                 $roles = Yii::$app->authManager->getAssignments($model->id);
-                                $url.="#/year/".(app\models\User::$yearFilter)."/month/".
+                                $url .= "#/year/" . (app\models\User::$yearFilter) . "/month/" .
                                     (app\models\User::$monthFilter);
                                 return Html::a('<i class="glyphicon glyphicon-eye-open"></i>', $url, [
                                     'class' => 'btn btn-xs btn-info',
@@ -162,6 +162,12 @@ echo AlertBlock::widget([
             ]);
 
             ?>
+        </div>
+        <div class="panel-footer">
+            <a class="btn btn-success" href="<?=$holidayReportUrl?>"><i class="fa fa-file-pdf-o"></i> Szabadság
+                jelentés</a>
+            <a class="btn btn-success" href="<?=$absenceReportUrl?>"><i class="fa fa-file-pdf-o"></i> Távollét
+                jelentés</a>
         </div>
     </div>
 

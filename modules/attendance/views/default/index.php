@@ -170,14 +170,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="panel-body">
             <a ng-href="{{getReportUrl('report-attendance')}}"
                class="btn btn-success" style="margin-bottom: 5px"><i
-                    class="fa fa-file-pdf-o"></i> Jelenlét jelentés</a>
-            <br/>
-            <a ng-href="{{getReportUrl('report-holiday')}}"
-               class="btn btn-success" style="margin-bottom: 5px"><i class="fa fa-file-pdf-o"></i> Szabadság
-                jelentés</a><br/>
-            <a ng-href="{{getReportUrl('report-absence')}}"
-               class="btn btn-success" style="margin-bottom: 5px"><i class="fa fa-file-pdf-o"></i> Távollét
-                jelentés</a><br/>
+                    class="fa fa-file-pdf-o"></i> Jelenlét jelentés (PDF generálás) </a>
 
 
         </div>
