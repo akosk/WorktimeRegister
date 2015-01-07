@@ -62,7 +62,7 @@ class User extends BaseUser
             ->onCondition('year=:year AND month=:month', [':year' => self::$yearFilter, ':month'=>self::$monthFilter]);
     }
 
-    public function updateUserDepartmentId($user_id = null)
+    public function updateUserDepartmentIdAndName($user_id = null)
     {
         $where='';
         if ($user_id!==null) {
@@ -71,7 +71,7 @@ class User extends BaseUser
         $q = "UPDATE profile
                 LEFT JOIN user_import ui ON ui.taxnumber=profile.taxnumber
                 LEFT JOIN department d ON ui.department_code=d.code
-                SET department_id=d.id $where";
+                SET profile.name=ui.name, department_id=d.id $where";
         return Yii::$app->db->createCommand($q)->execute();
 
     }

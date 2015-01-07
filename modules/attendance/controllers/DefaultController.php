@@ -464,7 +464,7 @@ class DefaultController extends Controller
             }
 
             $user = new User();
-            $user->updateUserDepartmentId();
+            $user->updateUserDepartmentIdAndName();
             $user->updateUserRoles();
 
             if ($imported == $count) {
