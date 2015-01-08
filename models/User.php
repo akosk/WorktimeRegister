@@ -68,7 +68,7 @@ class User extends BaseUser
         $auth = \Yii::$app->authManager;
         $auth->revokeAll($this->id);
         foreach ($newRoles as $untranslatedRoleName) {
-            $role=$this->translate($untranslatedRoleName);
+            $role = $this->translate($untranslatedRoleName);
             $authRole = $auth->getRole($role);
             if ($authRole) {
                 $auth->assign($authRole, $this->id);
@@ -76,10 +76,11 @@ class User extends BaseUser
         }
     }
 
-    private function translate($s) {
-        $arr=ArrayHelper::map(
+    private function translate($s)
+    {
+        $arr = ArrayHelper::map(
             \Yii::$app->authManager->getRoles(),
-            function ($role){
+            function ($role) {
                 return Yii::t('app', $role->name);
             },
             'name'
@@ -94,15 +95,20 @@ class User extends BaseUser
 
     public function getCurrentCompletions()
     {
+        return $this->getCompletionOfMonth(self::$yearFilter, self::$monthFilter);
+    }
+
+    public function getCompletionOfMonth($year, $month)
+    {
         return $this->hasMany(Completion::className(), ['user_id' => 'id'])
-            ->onCondition('year=:year AND month=:month', [':year' => self::$yearFilter, ':month'=>self::$monthFilter]);
+            ->onCondition('year=:year AND month=:month', [':year' => $year, ':month' => $month]);
     }
 
     public function updateUserDepartmentIdAndName($user_id = null)
     {
-        $where='';
-        if ($user_id!==null) {
-            $where="WHERE profile.user_id=$user_id";
+        $where = '';
+        if ($user_id !== null) {
+            $where = "WHERE profile.user_id=$user_id";
         }
         $q = "UPDATE profile
                 LEFT JOIN user_import ui ON ui.taxnumber=profile.taxnumber
@@ -112,11 +118,11 @@ class User extends BaseUser
 
     }
 
-    public function updateUserRoles($user_id=null)
+    public function updateUserRoles($user_id = null)
     {
-        $where='';
-        if ($user_id!==null) {
-            $where="WHERE p.user_id=$user_id";
+        $where = '';
+        if ($user_id !== null) {
+            $where = "WHERE p.user_id=$user_id";
         }
 
         $q = "SELECT p.user_id, t.`group`, t.admin

@@ -602,14 +602,24 @@ class DefaultController extends Controller
 
         $user = User::findOne($user_id);
 
+
+        $aq = $user->getCompletionOfMonth($year, $month);
+        $completion=$aq->one();
+        $isCompleted = $completion != null;
+
         $data = $this->getReportData($user_id, $year, $month);
+
+        $userRoles = Yii::$app->authManager->getRolesByUser($user_id);
 
 
         $content = $this->renderPartial('_report-attendance', [
-            'user'        => $user,
-            'year'        => $year,
-            'monthName'   => DateHelper::getMonthName($month),
-            'attendances' => $data
+            'user'         => $user,
+            'isInstructor' => isset($userRoles['instructor']),
+            'year'         => $year,
+            'monthName'    => DateHelper::getMonthName($month),
+            'attendances'  => $data,
+            'isCompleted'  => $isCompleted,
+
         ]);
 
         $pdf = $this->createPdf($content, 'jelenlet');
@@ -650,7 +660,7 @@ class DefaultController extends Controller
     public function isContinous($absence, $row)
     {
         return intval(substr($absence['date_to'], -2)) + 1 == intval(substr($row['date'],
-            -2)) && $absence['code']==$row['code'];
+            -2)) && $absence['code'] == $row['code'];
     }
 
     public function hasRight($userId)
@@ -821,13 +831,13 @@ class DefaultController extends Controller
      * @param $month
      * @return array
      */
-    public function getAbsenceReport($year, $month, $holidays=false)
+    public function getAbsenceReport($year, $month, $holidays = false)
     {
-        $holidaysOrNotSql='';
+        $holidaysOrNotSql = '';
         if ($holidays) {
-            $holidaysOrNotSql=' IN ';
+            $holidaysOrNotSql = ' IN ';
         } else {
-            $holidaysOrNotSql=' NOT IN ';
+            $holidaysOrNotSql = ' NOT IN ';
         }
 
         $filters = [];
