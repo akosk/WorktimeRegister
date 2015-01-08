@@ -21,6 +21,7 @@
       var _attendances_closed = false;
       var _absences_closed = false;
       var _instructorAttendance = false;
+      var _absences_closed_day = null;
 
       var _absenceTypes = [
          {id: '1', code: '25004', label: 'TERHESSÉGI GYERMEKÁGYI SEGÉLY'},
@@ -66,9 +67,9 @@
          })
             .then(function (result) {
                var _temp = result.data.attendances === undefined ? [] : result.data.attendances;
-
                _attendances_closed = result.data.attendances_closed;
                _absences_closed = result.data.absences_closed;
+               _absences_closed_day = result.data.absences_closed_day;
 
                _temp = helpers.completeEmptyDays(_temp, year, month);
 
@@ -238,6 +239,10 @@
          return _absences_closed;
       };
 
+      var _getAbsencesClosedDay = function () {
+         return _absences_closed_day;
+      };
+
       var _getInstructorAttendanceValue = function () {
          return _instructorAttendance;
       };
@@ -256,7 +261,8 @@
          instructorAttendance        : _instructorAttendance,
          setInstructorAttendance     : _setInstructorAttendance,
          getInstructorAttendance     : _getInstructorAttendance,
-         getInstructorAttendanceValue: _getInstructorAttendanceValue
+         getInstructorAttendanceValue: _getInstructorAttendanceValue,
+         getAbsencesClosedDay        : _getAbsencesClosedDay
       };
    }
 

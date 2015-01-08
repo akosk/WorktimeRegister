@@ -115,7 +115,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
                     <td>
                         <div class="btn-group" ng-show="a.userWorkDay">
-                            <button ng-show="!ourData.isAbsencesClosed() && !editDisabled" type="button" class="btn
+
+                            <button ng-show="(!ourData.isAbsencesClosed() || currentDateIsAfterAbsenceClose(a)) && !editDisabled" type="button"
+                                    class="btn
                                 btn-success btn-xs dropdown-toggle"
                                     data-toggle="dropdown" aria-expanded="false">
                                 <i class="fa fa-calendar fa-2x"></i>
@@ -147,7 +149,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
                                     <span ng-show="((!isUserOnFreeDay(a) && ((a.from!==null) || (a.to!==null))) ||
-                                    a.userAbsence!==undefined) && !ourData.isAttendancesClosed() && !editDisabled"
+                                    (a.userAbsence!==undefined && (!ourData.isAbsencesClosed() ||
+                                    currentDateIsAfterAbsenceClose(a)) )
+                                    )
+                                     && !ourData
+                                    .isAttendancesClosed() && !editDisabled"
                                           ng-click="clearTimes(a)"
                                           class="btn btn-danger btn-xs"
                                           href="#" title="Töröl">

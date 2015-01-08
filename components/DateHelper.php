@@ -31,4 +31,10 @@ class DateHelper
         $dw = date( "w", strtotime($date));
         return $dw==0 || $dw==6;
     }
+
+    public static function alreadyLast($year, $month, $day)
+    {
+        $ellapsed = time() - strtotime("{$year}-{$month}-{$day}");
+        return $ellapsed>=0;
+    }
 } 

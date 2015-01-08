@@ -42,6 +42,7 @@ class CloseMonth extends \yii\db\ActiveRecord
         return $closeMonth;
     }
 
+
     /**
      * @inheritdoc
      */
@@ -72,6 +73,16 @@ class CloseMonth extends \yii\db\ActiveRecord
     {
         return self::findCloseMonth($year, $month, $department_id)->attendances_closed == 1;
     }
+
+    public static function isAbsencesClosedDay($year, $month, $department_id)
+    {
+        $closeMonth = self::findCloseMonth($year, $month, $department_id);
+        $date=$closeMonth->absences_close_time;
+        $day = date('d', strtotime($date));
+        return intval($day);
+
+    }
+
 
     public static function isAbsencesClosed($year, $month, $department_id)
     {

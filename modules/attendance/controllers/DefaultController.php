@@ -31,6 +31,7 @@ use yii\rbac\Role;
 use yii\web\Controller;
 use yii\web\HttpException;
 use kartik\mpdf\Pdf;
+use \yii\db\Expression;
 
 class DefaultController extends Controller
 {
@@ -316,8 +317,10 @@ class DefaultController extends Controller
             'prevMonth'         => $month == 1 ? 12 : $month - 1,
             'hasIncompleteUser' => $hasIncompleteUser,
             'closeMonth'        => $closeMonth,
-            'canClose'          => Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
-            Yii::$app->user->can('dep_admin') ? '' : 'disabled',
+            'canCloseAbsence'          => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
+            Yii::$app->user->can('dep_admin')) && DateHelper::alreadyLast($year,$month,16) ? '' : 'disabled',
+            'canCloseAttendance'          => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
+            Yii::$app->user->can('dep_admin')) ? '' : 'disabled',
             'holidayReportUrl'  => $holidayReportUrl,
             'absenceReportUrl'  => $absenceReportUrl
         ]);
@@ -509,8 +512,10 @@ class DefaultController extends Controller
             $closeMonth->department_id = $user->profile->department->id;
         }
 
-        $target = strtolower($target) . '_closed';
-        $closeMonth->$target = 1;
+        $target1 = strtolower($target) . '_closed';
+        $closeMonth->$target1 = 1;
+        $target2 = strtolower($target) . '_close_time';
+        $closeMonth->$target2 = new \yii\db\Expression('NOW()');
 
         if ($closeMonth->save()) {
             \Yii::$app->getSession()->setFlash('success', '<strong>Zárolva!</strong> A zárolás sikeresen megtörtént.');
@@ -732,6 +737,8 @@ class DefaultController extends Controller
 
         $data['absences_closed'] = CloseMonth::isAbsencesClosed($year, $month, $currentUser->profile->department->id);
         $data['attendances_closed'] = CloseMonth::isAttendancesClosed($year, $month,
+            $currentUser->profile->department->id);
+        $data['absences_closed_day'] = CloseMonth::isAbsencesClosedDay($year, $month,
             $currentUser->profile->department->id);
         return $data;
     }

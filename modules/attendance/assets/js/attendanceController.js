@@ -49,7 +49,7 @@
       });
 
       $scope.$watch('ourData', function (newVal, oldVal) {
-         if (oldVal.attendances.length !== 0 && $scope.isAttendancesValid()) {
+         if (oldVal.attendances.length !== 0  && oldVal.attendances.length==newVal.attendances.length && $scope.isAttendancesValid()) {
             var firstChanged = _.find(newVal.attendances, function (item, idx) {
                return item.from !== oldVal.attendances[idx].from || item.to !== oldVal.attendances[idx].to;
             });
@@ -254,6 +254,12 @@
                $scope.focusedItem = null;
             });
 
+
+      };
+
+      $scope.currentDateIsAfterAbsenceClose= function (item) {
+         var date=new Date(item.date);
+         return date.getDate()>dataService.getAbsencesClosedDay();
 
       };
 
