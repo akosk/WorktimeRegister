@@ -863,6 +863,12 @@ class DefaultController extends Controller
             ":month" => $month
         ];
 
+        if (!(Yii::$app->user->can('admin') || Yii::$app->user->can('payroll_manager'))) {
+            $currentUser = User::findOne(\Yii::$app->user->id);
+            $params[':department_id'] = $currentUser->profile->department_id;
+            $filters[] = 'p.department_id=:department_id';
+        }
+
         if (isset($_GET['UserSearch'])) {
             $userSearch = $_GET['UserSearch'];
             if ($userSearch['username'] != '') {
