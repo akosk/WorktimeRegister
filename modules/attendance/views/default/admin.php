@@ -51,6 +51,7 @@ echo AlertBlock::widget([
                 </div>
                 <div class="panel-body">
 
+                    <h3><?= $currentUser->profile->department->name ?></h3>
                     <?php if ($hasIncompleteUser) { ?>
                         <div class="alert alert-danger" role="alert"><strong><i class="fa fa-exclamation-triangle"></i>
                                 Figyelem!</strong>

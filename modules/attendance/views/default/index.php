@@ -116,7 +116,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <td>
                         <div class="btn-group" ng-show="a.userWorkDay">
 
-                            <button ng-show="(!ourData.isAbsencesClosed() || currentDateIsAfterAbsenceClose(a)) && !editDisabled" type="button"
+                            <button ng-show="(!ourData.isAbsencesClosed() || currentDateIsAfterAbsenceClose(a)) &&
+                            !editDisabled && !ourData.isAttendancesClosed()" type="button"
                                     class="btn
                                 btn-success btn-xs dropdown-toggle"
                                     data-toggle="dropdown" aria-expanded="false">

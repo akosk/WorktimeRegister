@@ -283,8 +283,10 @@ class DefaultController extends Controller
             INNER JOIN profile p ON p.user_id=t.id
             LEFT JOIN completion c ON c.user_id=t.id AND c.year=:year AND c.month=:month
             WHERE p.department_id=:department_id AND c.id IS NULL";
-        $db = \Yii::$app->db->createCommand($q, [':year'          => $year, ':month' => $month,
-                                                 ':department_id' => 1])->queryScalar();
+        $db = \Yii::$app->db->createCommand($q,
+            [':year'          => $year, ':month' => $month,
+             ':department_id' => $currentUser->profile->department_id]
+        )->queryScalar();
         $hasIncompleteUser = $db > 0;
 
 
