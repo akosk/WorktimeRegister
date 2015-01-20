@@ -305,24 +305,24 @@ class DefaultController extends Controller
         ], $_GET));
 
         return $this->render('admin', [
-            'dataProvider'      => $dataProvider,
-            'userSearch'        => $userSearch,
-            'currentUser'       => $currentUser,
-            'year'              => $year,
-            'month'             => $month,
-            'monthName'         => DateHelper::getMonthName($month),
-            'nextMonthsYear'    => $month == 12 ? $year + 1 : $year,
-            'nextMonth'         => $month == 12 ? 1 : $month + 1,
-            'prevMonthsYear'    => $month == 1 ? $year - 1 : $year,
-            'prevMonth'         => $month == 1 ? 12 : $month - 1,
-            'hasIncompleteUser' => $hasIncompleteUser,
-            'closeMonth'        => $closeMonth,
-            'canCloseAbsence'          => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
-            Yii::$app->user->can('dep_admin')) && DateHelper::alreadyLast($year,$month,16) ? '' : 'disabled',
-            'canCloseAttendance'          => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
-            Yii::$app->user->can('dep_admin')) ? '' : 'disabled',
-            'holidayReportUrl'  => $holidayReportUrl,
-            'absenceReportUrl'  => $absenceReportUrl
+            'dataProvider'       => $dataProvider,
+            'userSearch'         => $userSearch,
+            'currentUser'        => $currentUser,
+            'year'               => $year,
+            'month'              => $month,
+            'monthName'          => DateHelper::getMonthName($month),
+            'nextMonthsYear'     => $month == 12 ? $year + 1 : $year,
+            'nextMonth'          => $month == 12 ? 1 : $month + 1,
+            'prevMonthsYear'     => $month == 1 ? $year - 1 : $year,
+            'prevMonth'          => $month == 1 ? 12 : $month - 1,
+            'hasIncompleteUser'  => $hasIncompleteUser,
+            'closeMonth'         => $closeMonth,
+            'canCloseAbsence'    => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
+                Yii::$app->user->can('dep_admin')) && DateHelper::alreadyLast($year, $month, 16) ? '' : 'disabled',
+            'canCloseAttendance' => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
+                Yii::$app->user->can('dep_admin')) ? '' : 'disabled',
+            'holidayReportUrl'   => $holidayReportUrl,
+            'absenceReportUrl'   => $absenceReportUrl
         ]);
 
     }
@@ -430,21 +430,25 @@ class DefaultController extends Controller
             $imported = 0;
             $error = 0;
             for ($i = 2; $i <= count($sheetData); $i++) {
-                $userImport = new UserImport();
-                $userImport->taxnumber = (string)$sheetData[$i]['A'];
-                $userImport->relationship = $sheetData[$i]['B'];
-                $userImport->num = $sheetData[$i]['C'];
-                $userImport->name_prefix = $sheetData[$i]['D'];
-                $userImport->name = $sheetData[$i]['E'];
-                $userImport->reference_number = $sheetData[$i]['F'];
-                $userImport->department_code = $sheetData[$i]['G'];
-                $userImport->department_name = $sheetData[$i]['H'];
-                $userImport->group = $sheetData[$i]['I'];
-                $userImport->admin = count($sheetData[$i]['J']) == 0 ? 0 : 1;
-                if ($userImport->save()) {
-                    $imported++;
+                if ((string)$sheetData[$i]['A'] != '') {
+                    $userImport = new UserImport();
+                    $userImport->taxnumber = (string)$sheetData[$i]['A'];
+                    $userImport->relationship = $sheetData[$i]['B'];
+                    $userImport->num = $sheetData[$i]['C'];
+                    $userImport->name_prefix = $sheetData[$i]['D'];
+                    $userImport->name = $sheetData[$i]['E'];
+                    $userImport->reference_number = $sheetData[$i]['F'];
+                    $userImport->department_code = $sheetData[$i]['G'];
+                    $userImport->department_name = $sheetData[$i]['H'];
+                    $userImport->group = $sheetData[$i]['I'];
+                    $userImport->admin = count($sheetData[$i]['J']) == 0 ? 0 : 1;
+                    if ($userImport->save()) {
+                        $imported++;
+                    } else {
+                        $error++;
+                    }
                 } else {
-                    $error++;
+                    $count--;
                 }
             }
 
@@ -609,7 +613,7 @@ class DefaultController extends Controller
 
 
         $aq = $user->getCompletionOfMonth($year, $month);
-        $completion=$aq->one();
+        $completion = $aq->one();
         $isCompleted = $completion != null;
 
         $data = $this->getReportData($user_id, $year, $month);
