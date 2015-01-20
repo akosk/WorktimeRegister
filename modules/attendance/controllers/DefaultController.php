@@ -529,8 +529,12 @@ class DefaultController extends Controller
             \Yii::$app->getSession()->setFlash('error', '<strong>Hiba!</strong> A zárolás sikertelen.');
         }
 
-
-        return \Yii::$app->getResponse()->redirect(Url::toRoute('/attendance/default/admin'));
+        return \Yii::$app->getResponse()->redirect(
+            Url::toRoute([
+                '/attendance/default/admin',
+                'year'  => $year,
+                'month' => $month])
+        );
     }
 
     public function actionSetInstructorAttendance($id = null, $year, $month, $value)
