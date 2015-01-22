@@ -1,4 +1,5 @@
 <?php
+use app\components\assetbundles\FontawesomeAsset;
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
@@ -10,6 +11,7 @@ use app\assets\AppAsset;
 /* @var $content string */
 
 AppAsset::register($this);
+FontawesomeAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
