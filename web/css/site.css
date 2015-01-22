@@ -1,6 +1,25 @@
 html,
 body {
     height: 100%;
+    margin-top:15px;
+}
+
+.navbar {
+    padding-bottom: 15px;
+    padding-top: 15px;
+    -webkit-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+.navbar-inverse .navbar-nav > li > a, .navbar-inverse .navbar-brand {
+    color: #DDD;
+}
+
+.cbp-af-header-shrink {
+    padding-bottom: 0px;
+    padding-top: 0px;
+    opacity: 0.9;
+
 }
 
 .wrap {
@@ -89,3 +108,4 @@ a.desc:after {
     padding: 10px 20px;
     margin: 0 0 15px 0;
 }
+

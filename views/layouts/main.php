@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
+use yii\helpers\Url;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 
@@ -36,10 +37,10 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
     NavBar::begin([
-        'brandLabel' => 'Munkaidő nyilvántartó',
+        'brandLabel' => '<i class="fa fa-clock-o"></i> Munkaidő nyilvántartó',
         'brandUrl'   => Yii::$app->homeUrl,
         'options'    => [
-            'class' => 'navbar-default  navbar-fixed-top',
+            'class' => 'navbar-default  navbar-fixed-top navbar-inverse cbp-af-header',
         ],
     ]);
     echo Nav::widget([
@@ -120,6 +121,9 @@ AppAsset::register($this);
 </footer>
 
 <?php $this->endBody() ?>
+
+<script src="<?=Url::base();?>/js/classie.js" type="text/javascript"></script>
+<script src="<?=Url::base();?>/js/cbpAnimatedHeader.min.js" type="text/javascript"></script>
 </body>
 </html>
 <?php $this->endPage() ?>
