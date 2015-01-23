@@ -254,6 +254,14 @@ $this->params['breadcrumbs'][] = $this->title;
     var isDepAdmin = <?=\Yii::$app->user->can('dep_admin') ? 'true':'false' ?>;
     var isPayrollManager = <?=\Yii::$app->user->can('payroll_manager') ? 'true':'false' ?>;
     var userId =<?= $user->id?>;
+
+    // ha admin vagy ha szervezeti egység vezető/admin és ugyanaz a egység vagy a saját honlapodat szerkeszted
     var editDisabled =
-        <?=\Yii::$app->user->can('payroll_manager') && $user->id!=Yii::$app->user->id ? 'true':'false' ?>;
+        <?=
+        !(\Yii::$app->user->can('admin') ||
+        (
+            (\Yii::$app->user->can('dep_admin') || \Yii::$app->user->can('dep_leader')) &&
+        $currentUser->profile->department_id==$user->profile->department->id) ||
+        $user->id==Yii::$app->user->id)
+        ? 'true':'false' ?>;
 </script>

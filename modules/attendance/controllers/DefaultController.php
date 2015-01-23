@@ -74,9 +74,11 @@ class DefaultController extends Controller
 
 
         $user = User::findOne($id);
+        $currentUser=User::findOne(Yii::$app->user->id);
 
         return $this->render('index', [
             'user'      => $user,
+            'currentUser'      => $currentUser,
             'userRoles' => Yii::$app->authManager->getRolesByUser($id)
         ]);
     }
