@@ -50,7 +50,7 @@ class DefaultController extends Controller
                             'set-absence', 'remove-absence', 'admin', 'import', 'close',
                             'set-instructor-attendance', 'get-instructor-attendance',
                             'add-dep-admin', 'remove-dep-admin',
-                            'report-attendance', 'report-holiday', 'report-absence'],
+                            'report-attendance', 'report-attendances', 'report-holiday', 'report-absence'],
                         'allow'   => true,
                         'roles'   => ['@'],
                     ],
@@ -74,12 +74,12 @@ class DefaultController extends Controller
 
 
         $user = User::findOne($id);
-        $currentUser=User::findOne(Yii::$app->user->id);
+        $currentUser = User::findOne(Yii::$app->user->id);
 
         return $this->render('index', [
-            'user'      => $user,
-            'currentUser'      => $currentUser,
-            'userRoles' => Yii::$app->authManager->getRolesByUser($id)
+            'user'        => $user,
+            'currentUser' => $currentUser,
+            'userRoles'   => Yii::$app->authManager->getRolesByUser($id)
         ]);
     }
 
@@ -308,25 +308,33 @@ class DefaultController extends Controller
 
         ], $_GET));
 
+        $attendancesReportUrl = Url::to(ArrayHelper::merge([
+            '/attendance/default/report-attendances',
+            'year'  => $year,
+            'month' => $month
+
+        ], $_GET));
+
         return $this->render('admin', [
-            'dataProvider'       => $dataProvider,
-            'userSearch'         => $userSearch,
-            'currentUser'        => $currentUser,
-            'year'               => $year,
-            'month'              => $month,
-            'monthName'          => DateHelper::getMonthName($month),
-            'nextMonthsYear'     => $month == 12 ? $year + 1 : $year,
-            'nextMonth'          => $month == 12 ? 1 : $month + 1,
-            'prevMonthsYear'     => $month == 1 ? $year - 1 : $year,
-            'prevMonth'          => $month == 1 ? 12 : $month - 1,
-            'hasIncompleteUser'  => $hasIncompleteUser,
-            'closeMonth'         => $closeMonth,
-            'canCloseAbsence'    => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
+            'dataProvider'         => $dataProvider,
+            'userSearch'           => $userSearch,
+            'currentUser'          => $currentUser,
+            'year'                 => $year,
+            'month'                => $month,
+            'monthName'            => DateHelper::getMonthName($month),
+            'nextMonthsYear'       => $month == 12 ? $year + 1 : $year,
+            'nextMonth'            => $month == 12 ? 1 : $month + 1,
+            'prevMonthsYear'       => $month == 1 ? $year - 1 : $year,
+            'prevMonth'            => $month == 1 ? 12 : $month - 1,
+            'hasIncompleteUser'    => $hasIncompleteUser,
+            'closeMonth'           => $closeMonth,
+            'canCloseAbsence'      => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
                 Yii::$app->user->can('dep_admin')) && DateHelper::alreadyLast($year, $month, 16) ? '' : 'disabled',
-            'canCloseAttendance' => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
+            'canCloseAttendance'   => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
                 Yii::$app->user->can('dep_admin')) ? '' : 'disabled',
-            'holidayReportUrl'   => $holidayReportUrl,
-            'absenceReportUrl'   => $absenceReportUrl
+            'holidayReportUrl'     => $holidayReportUrl,
+            'absenceReportUrl'     => $absenceReportUrl,
+            'attendancesReportUrl' => $attendancesReportUrl
         ]);
 
     }
@@ -644,6 +652,55 @@ class DefaultController extends Controller
         return $pdf->render();
     }
 
+    public function actionReportAttendances($year, $month)
+    {
+
+        $currentUser = User::findOne(\Yii::$app->user->id);
+
+        $closeMonth = CloseMonth::find()->where('year=:year AND month=:month AND department_id=:department_id',
+            [
+                ':year'          => $year,
+                ':month'         => $month,
+                ':department_id' => $currentUser->profile->department->id,
+            ])->one();
+        if (!$closeMonth) $closeMonth = new CloseMonth();
+
+
+        $userSearch = new UserSearch();
+        $userSearch->year = $year;
+        $userSearch->month = $month;
+        $dataProvider = $userSearch->search(\Yii::$app->request->queryParams);
+
+        $users = $dataProvider->getModels();
+
+        $content="";
+        foreach ($users as $user) {
+
+            $aq = $user->getCompletionOfMonth($year, $month);
+            $completion = $aq->one();
+            $isCompleted = $completion != null;
+
+            $data = $this->getReportData($user->id, $year, $month);
+
+            $userRoles = Yii::$app->authManager->getRolesByUser($user->id);
+            $content .= $this->renderPartial('_report-attendance', [
+                'user'         => $user,
+                'isInstructor' => isset($userRoles['instructor']),
+                'year'         => $year,
+                'monthName'    => DateHelper::getMonthName($month),
+                'attendances'  => $data,
+                'isCompleted'  => $isCompleted,
+
+            ])."<pagebreak />";
+
+        }
+
+
+        $pdf = $this->createPdf($content, 'jelenlet');
+
+        return $pdf->render();
+    }
+
     public function actionReportHoliday($year, $month)
     {
         $aggregatedAbsences = $this->getAbsenceReport($year, $month, true);
@@ -764,8 +821,8 @@ class DefaultController extends Controller
      */
     public function insertDate($year, $month, $iDay, &$data)
     {
-        $m = $month < 10 ? '0' . $month : $month;
-        $d = $iDay < 10 ? '0' . $iDay : $iDay;
+        $m = strlen($month)==1 ? '0' . $month : $month;
+        $d = strlen($iDay)==1 ? '0' . $iDay : $iDay;
         $dateStr = "$year-$m-$d";
         $data[] = [
             'date'        => $dateStr,
