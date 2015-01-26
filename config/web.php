@@ -112,7 +112,8 @@ $config = [
             ],
             'controllerMap' => [
                 'security' => 'app\controllers\SecurityController',
-                'admin' => 'app\controllers\AdminController'
+                'admin' => 'app\controllers\AdminController',
+                'settings' => 'app\controllers\SettingsController'
             ],
             'enableUnconfirmedLogin' => true,
             'enableConfirmation'     => false,

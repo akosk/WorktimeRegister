@@ -85,15 +85,23 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         [
             'class'    => 'yii\grid\ActionColumn',
-            'template' => '{update}',
+            'template' => '{update} {profile}',
+            'contentOptions'=>['style'=>'min-width: 69px;'],
             'buttons'  => [
-                'update' => function ($url, $model) {
+                'update'  => function ($url, $model) {
                     return Html::a('<i class="glyphicon glyphicon-wrench"></i>', $url, [
                         'class' => 'btn btn-xs btn-info',
                         'title' => Yii::t('yii', 'Update'),
                     ]);
                 },
-                'delete' => function ($url, $model) {
+                'profile' => function ($url, $model) {
+                    $url=\yii\helpers\Url::to(['/user/settings/profile','id'=>$model->id]);
+                    return Html::a('<i class="glyphicon glyphicon-pencil"></i>', $url, [
+                        'class' => 'btn btn-xs btn-info',
+                        'title' => Yii::t('yii', 'Profil szerkesztése'),
+                    ]);
+                },
+                'delete'  => function ($url, $model) {
                     return Html::a('<i class="glyphicon glyphicon-trash"></i>', $url, [
                         'class'        => 'btn btn-xs btn-danger',
                         'data-method'  => 'post',
