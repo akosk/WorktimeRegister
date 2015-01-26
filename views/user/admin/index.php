@@ -25,52 +25,58 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel'  => $searchModel,
-    'layout' => "{items}\n{pager}",
-    'columns' => [
+    'layout'       => "{items}\n{pager}",
+    'columns'      => [
         'username',
+        [
+            'attribute' => 'name',
+            'value'     => function ($model, $key, $index, $widget) {
+                return $model->profile->name;
+            }
+        ],
         'email:email',
         [
             'attribute' => 'registration_ip',
-            'value' => function ($model, $key, $index, $widget) {
+            'value'     => function ($model, $key, $index, $widget) {
                 return $model->registration_ip == null ? '<span class="not-set">' . Yii::t('user', '(not set)') . '</span>' : long2ip($model->registration_ip);
             },
-            'format' => 'html',
+            'format'    => 'html',
         ],
         [
             'attribute' => 'created_at',
-            'value' => function ($model, $key, $index, $widget) {
+            'value'     => function ($model, $key, $index, $widget) {
                 return Yii::t('user', '{0, date, MMMM dd, YYYY HH:mm}', [$model->created_at]);
             }
         ],
         [
-            'header' => Yii::t('user', 'Confirmation'),
-            'value' => function ($model, $key, $index, $widget) {
+            'header'  => Yii::t('user', 'Confirmation'),
+            'value'   => function ($model, $key, $index, $widget) {
                 if ($model->isConfirmed) {
                     return '<div class="text-center"><span class="text-success">' . Yii::t('user', 'Confirmed') . '</span></div>';
                 } else {
                     return Html::a(Yii::t('user', 'Confirm'), ['confirm', 'id' => $model->id], [
-                        'class' => 'btn btn-xs btn-success btn-block',
-                        'data-method' => 'post',
+                        'class'        => 'btn btn-xs btn-success btn-block',
+                        'data-method'  => 'post',
                         'data-confirm' => Yii::t('user', 'Are you sure to confirm this user?'),
                     ]);
                 }
             },
-            'format' => 'raw',
+            'format'  => 'raw',
             'visible' => Yii::$app->getModule('user')->enableConfirmation
         ],
         [
             'header' => Yii::t('user', 'Block status'),
-            'value' => function ($model, $key, $index, $widget) {
+            'value'  => function ($model, $key, $index, $widget) {
                 if ($model->isBlocked) {
                     return Html::a(Yii::t('user', 'Unblock'), ['block', 'id' => $model->id], [
-                        'class' => 'btn btn-xs btn-success btn-block',
-                        'data-method' => 'post',
+                        'class'        => 'btn btn-xs btn-success btn-block',
+                        'data-method'  => 'post',
                         'data-confirm' => Yii::t('user', 'Are you sure to unblock this user?')
                     ]);
                 } else {
                     return Html::a(Yii::t('user', 'Block'), ['block', 'id' => $model->id], [
-                        'class' => 'btn btn-xs btn-danger btn-block',
-                        'data-method' => 'post',
+                        'class'        => 'btn btn-xs btn-danger btn-block',
+                        'data-method'  => 'post',
                         'data-confirm' => Yii::t('user', 'Are you sure to block this user?')
                     ]);
                 }
@@ -78,9 +84,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'format' => 'raw',
         ],
         [
-            'class' => 'yii\grid\ActionColumn',
+            'class'    => 'yii\grid\ActionColumn',
             'template' => '{update}',
-            'buttons' => [
+            'buttons'  => [
                 'update' => function ($url, $model) {
                     return Html::a('<i class="glyphicon glyphicon-wrench"></i>', $url, [
                         'class' => 'btn btn-xs btn-info',
@@ -89,10 +95,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'delete' => function ($url, $model) {
                     return Html::a('<i class="glyphicon glyphicon-trash"></i>', $url, [
-                        'class' => 'btn btn-xs btn-danger',
-                        'data-method' => 'post',
+                        'class'        => 'btn btn-xs btn-danger',
+                        'data-method'  => 'post',
                         'data-confirm' => Yii::t('user', 'Are you sure to delete this user?'),
-                        'title' => Yii::t('yii', 'Delete'),
+                        'title'        => Yii::t('yii', 'Delete'),
                     ]);
                 },
             ]

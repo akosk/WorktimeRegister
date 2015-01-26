@@ -105,6 +105,7 @@ $config = [
             'components'             => [
                 'manager' => [
                     'userClass' => 'app\models\User',
+                    'userSearchClass' => 'app\models\UserSearch',
                     'profileClass' => 'app\models\Profile',
                     'loginFormClass' => 'app\models\LoginForm',
                 ],
