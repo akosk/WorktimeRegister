@@ -113,7 +113,7 @@ class DefaultController extends Controller
             $year = date('Y', $timestamp);
             $month = date('m', $timestamp);
 
-            if (CloseMonth::isAbsencesClosed(
+            if (CloseMonth::isAttendancesClosed(
                 $year,
                 $month,
                 $currentUser->profile->department->id
