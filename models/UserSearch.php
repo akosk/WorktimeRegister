@@ -10,6 +10,7 @@ namespace app\models;
 use dektrium\user\models\UserSearch as BaseUserSearch;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 
 class UserSearch extends BaseUserSearch
 {
@@ -20,7 +21,7 @@ class UserSearch extends BaseUserSearch
     {
         return [
             [['created_at'], 'integer'],
-            [[ 'name','username', 'email', 'registered_from'], 'safe'],
+            [['name', 'username', 'email', 'registered_from'], 'safe'],
         ];
     }
 

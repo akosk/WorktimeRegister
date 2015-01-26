@@ -18,6 +18,15 @@ class User extends BaseUser
 
     public static $yearFilter, $monthFilter;
 
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(
+            parent::attributeLabels(), [
+                'name' => 'Név',
+            ]
+        );
+    }
+
 
     public function rules()
     {
