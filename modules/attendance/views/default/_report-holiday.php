@@ -38,3 +38,8 @@ use app\modules\attendance\models\Absence;
     <?php } ?>
     </tbody>
 </table>
+
+<?php echo $this->render('_footer', [
+    'signatureLeft'=>'Kitöltésért felelős',
+    'signatureRight'=>'Szervezeti egység vezető',
+]); ?>
