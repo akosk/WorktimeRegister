@@ -890,7 +890,7 @@ class DefaultController extends Controller
             // enhanced bootstrap css built by Krajee for mPDF formatting
             'cssFile'     => '@vendor/kartik-v/yii2-mpdf/assets/kv-mpdf-bootstrap.min.css',
             // any css to be embedded if required
-            'cssInline'   => '.kv-heading-1{font-size:18px} body {font-size:12px;}',
+            'cssInline'   => '.kv-heading-1{font-size:18px} body {font-size:10px;}',
             // set mPDF properties on the fly
             'options'     => ['title' => 'Munkaidő nyilvántartó'],
             // call mPDF methods on the fly
