@@ -33,6 +33,11 @@ class UserSearch extends BaseUserSearch
             'query' => $query,
         ]);
 
+        $dataProvider->sort->attributes['name'] = [
+            'asc'  => ['profile.name' => SORT_ASC],
+            'desc' => ['profile.name' => SORT_DESC],
+        ];
+
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }
@@ -49,10 +54,6 @@ class UserSearch extends BaseUserSearch
         $this->addCondition($query, 'created_at');
         $this->addCondition($query, 'registered_from');
 
-        $dataProvider->sort->attributes['name'] = [
-            'asc'  => ['profile.name' => SORT_ASC],
-            'desc' => ['profile.name' => SORT_DESC],
-        ];
 
         return $dataProvider;
     }
