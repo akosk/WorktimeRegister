@@ -353,11 +353,11 @@ class DefaultController extends Controller
 
         if ($id && $year && $month) {
             $attendances = Attendance::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
-                [':year' => $year, ':month' => $month, ':userId' => \Yii::$app->user->id])->orderBy('date')->all();
+                [':year' => $year, ':month' => $month, ':userId' => $id])->orderBy('date')->all();
             $redLetterDays = RedLetterDay::find()->where('YEAR(date)=:year AND MONTH(date)=:month',
                 [':year' => $year, ':month' => $month])->orderBy('date')->all();
             $absences = Absence::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
-                [':year' => $year, ':month' => $month, ':userId' => \Yii::$app->user->id])->orderBy('date')->all();
+                [':year' => $year, ':month' => $month, ':userId' => $id])->orderBy('date')->all();
 
             $date = new \DateTime();
             $date->setDate($year, $month, 1);
@@ -382,17 +382,17 @@ class DefaultController extends Controller
                 Completion::deleteAll('year=:year AND month=:month AND user_id=:user_id', [
                     ':year'    => $year,
                     ':month'   => $month,
-                    ':user_id' => \Yii::$app->user->id,
+                    ':user_id' => $id,
                 ]);
             } else {
                 $completion = Completion::find()->where('year=:year AND month=:month AND user_id=:user_id', [
                     ':year'    => $year,
                     ':month'   => $month,
-                    ':user_id' => \Yii::$app->user->id,
+                    ':user_id' => $id,
                 ])->one();
                 if (!$completion) {
                     $completion = new Completion();
-                    $completion->user_id = \Yii::$app->user->id;
+                    $completion->user_id = $id;
                     $completion->year = $year;
                     $completion->month = $month;
                     $completion->save();
