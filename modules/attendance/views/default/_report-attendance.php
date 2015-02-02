@@ -30,7 +30,7 @@ if ($isInstructor) {
 ?>
 
 <div>
-    <strong> Alulírott XY kijelentem, hogy a munkaidőmet a fenti időszakra teljesítettem.</strong>
+    <strong> Alulírott <?=$user->profile->name ?> kijelentem, hogy a munkaidőmet a fenti időszakra teljesítettem.</strong>
 </div>
 
 
