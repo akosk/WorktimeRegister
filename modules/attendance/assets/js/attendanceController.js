@@ -259,7 +259,7 @@
 
       $scope.currentDateIsAfterAbsenceClose= function (item) {
          var date=new Date(item.date);
-         return date.getDate()>dataService.getAbsencesClosedDay();
+         return date.getDate()>=dataService.getAbsencesClosedDay();
 
       };
 
