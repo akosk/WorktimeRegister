@@ -23,7 +23,8 @@ if ($isInstructor) {
     ]);
 } else {
     echo $this->render('_report_attendance_worker', [
-        'attendances' => $attendances
+        'attendances' => $attendances,
+        'totalEllapsedTime' => $totalEllapsedTime
     ]);
 
 }

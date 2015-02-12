@@ -15,6 +15,7 @@ use app\modules\attendance\models\Absence;
         <th>Dátum</th>
         <th>Érkezés ideje</th>
         <th>Távozás ideje</th>
+        <th>Bent töltött idő</th>
     </tr>
     </thead>
     <tbody>
@@ -28,11 +29,18 @@ use app\modules\attendance\models\Absence;
                 ?>
                 <td><?= $item['from'] ?></td>
                 <td><?= $item['to'] ?></td>
+                <td><?= $item['worktime'] ?></td>
             <?php } else { ?>
-                <td colspan="2"><?= isset($item['userAbsenceCode']) ?
+                <td colspan="3"><?= isset($item['userAbsenceCode']) ?
                         Absence::$ABSENCES[$item['userAbsenceCode']] : 'Munkaszüneti nap' ?></td>
             <?php } ?>
         </tr>
     <?php } ?>
+
+    <tr>
+        <td colspan="2"></td>
+        <td><strong>Összesen:</strong></td>
+        <td><strong><?=$totalEllapsedTime?> óra</strong></td>
+    </tr>
     </tbody>
 </table>

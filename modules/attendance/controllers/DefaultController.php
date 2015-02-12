@@ -638,12 +638,13 @@ class DefaultController extends Controller
 
 
         $content = $this->renderPartial('_report-attendance', [
-            'user'         => $user,
-            'isInstructor' => isset($userRoles['instructor']),
-            'year'         => $year,
-            'monthName'    => DateHelper::getMonthName($month),
-            'attendances'  => $data,
-            'isCompleted'  => $isCompleted,
+            'user'              => $user,
+            'isInstructor'      => isset($userRoles['instructor']),
+            'year'              => $year,
+            'monthName'         => DateHelper::getMonthName($month),
+            'attendances'       => $data,
+            'totalEllapsedTime' => $this->sumEllapsedTimeInHour($data),
+            'isCompleted'       => $isCompleted,
 
         ]);
 
@@ -673,7 +674,7 @@ class DefaultController extends Controller
 
         $users = $dataProvider->getModels();
 
-        $content="";
+        $content = "";
         foreach ($users as $user) {
 
             $aq = $user->getCompletionOfMonth($year, $month);
@@ -684,14 +685,15 @@ class DefaultController extends Controller
 
             $userRoles = Yii::$app->authManager->getRolesByUser($user->id);
             $content .= $this->renderPartial('_report-attendance', [
-                'user'         => $user,
-                'isInstructor' => isset($userRoles['instructor']),
-                'year'         => $year,
-                'monthName'    => DateHelper::getMonthName($month),
-                'attendances'  => $data,
-                'isCompleted'  => $isCompleted,
+                    'user'              => $user,
+                    'isInstructor'      => isset($userRoles['instructor']),
+                    'year'              => $year,
+                    'monthName'         => DateHelper::getMonthName($month),
+                    'attendances'       => $data,
+                    'totalEllapsedTime' => $this->sumEllapsedTimeInHour($data),
+                    'isCompleted'       => $isCompleted,
 
-            ])."<pagebreak />";
+                ]) . "<pagebreak />";
 
         }
 
@@ -699,6 +701,16 @@ class DefaultController extends Controller
         $pdf = $this->createPdf($content, 'jelenlet');
 
         return $pdf->render();
+    }
+
+    public function sumEllapsedTimeInHour($data)
+    {
+        $total = array_reduce($data, function ($carry, $item) {
+            return $carry + $item['ellapsedTime'];
+        }, 0);
+
+        return round($total / 3600, 2);
+
     }
 
     public function actionReportHoliday($year, $month)
@@ -790,13 +802,26 @@ class DefaultController extends Controller
 
 
         foreach ($attendances AS $item) {
-            $data['attendances'][$item->date] = ArrayHelper::merge($data['attendances'][$item->date], [
-                'date' => $item->date,
-                'from' => $item->start ? date("H:i", strtotime($item->start)) : null,
-                'to'   => $item->end ? date("H:i", strtotime($item->end)) : null
-            ]);
-        }
+            if (!isset($data['attendances'][$item->date])
+                ||
+                !isset($data['attendances'][$item->date]['userWorkDay'])
+                ||
+                $data['attendances'][$item->date]['userWorkDay'] === true
+            ) {
 
+                $ellapsedTime = $item->start && $item->end ? strtotime($item->end) - strtotime($item->start) : 0;
+                $data['attendances'][$item->date] = ArrayHelper::merge($data['attendances'][$item->date], [
+                    'date'         => $item->date,
+                    'from'         => $item->start ? date("H:i", strtotime($item->start)) : null,
+                    'to'           => $item->end ? date("H:i", strtotime($item->end)) : null,
+                    'ellapsedTime' => $ellapsedTime,
+                    'worktime'     => $item->start && $item->end ?
+                        date("H:i", $ellapsedTime)
+                        :
+                        null
+                ]);
+            }
+        }
 
         if (isset($data['attendances'])) {
             $data['attendances'] = array_values($data['attendances']);
@@ -821,8 +846,8 @@ class DefaultController extends Controller
      */
     public function insertDate($year, $month, $iDay, &$data)
     {
-        $m = strlen($month)==1 ? '0' . $month : $month;
-        $d = strlen($iDay)==1 ? '0' . $iDay : $iDay;
+        $m = strlen($month) == 1 ? '0' . $month : $month;
+        $d = strlen($iDay) == 1 ? '0' . $iDay : $iDay;
         $dateStr = "$year-$m-$d";
         $data[] = [
             'date'        => $dateStr,
