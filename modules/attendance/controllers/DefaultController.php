@@ -855,7 +855,7 @@ class DefaultController extends Controller
                     'to'           => $item->end ? date("H:i", strtotime($item->end)) : null,
                     'ellapsedTime' => $ellapsedTime,
                     'worktime'     => $item->start && $item->end ?
-                        date("H:i", $ellapsedTime)
+                         round($ellapsedTime/3600,2)
                         :
                         null
                 ]);
