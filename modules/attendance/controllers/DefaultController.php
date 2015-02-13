@@ -12,6 +12,7 @@ use app\modules\attendance\models\Attendance;
 use app\modules\attendance\models\Absence;
 use app\modules\attendance\models\CloseMonth;
 use app\modules\attendance\models\Completion;
+use app\modules\attendance\models\CustomWorkday;
 use app\modules\attendance\models\Department;
 use app\modules\attendance\models\RedLetterDay;
 use app\modules\attendance\models\UserImport;
@@ -50,7 +51,9 @@ class DefaultController extends Controller
                             'set-absence', 'remove-absence', 'admin', 'import', 'close',
                             'set-instructor-attendance', 'get-instructor-attendance',
                             'add-dep-admin', 'remove-dep-admin',
-                            'report-attendance', 'report-attendances', 'report-holiday', 'report-absence'],
+                            'report-attendance', 'report-attendances', 'report-holiday', 'report-absence',
+                            'set-custom-working-day'
+                        ],
                         'allow'   => true,
                         'roles'   => ['@'],
                     ],
@@ -178,6 +181,32 @@ class DefaultController extends Controller
                 if (isset($data['date']) && isset($data['delete'])) {
                     RedLetterDay::deleteAll('date=:date', [':date' => $data['date']]);
                 }
+        }
+        echo "OK";
+    }
+
+    public function actionSetCustomWorkingDay($id)
+    {
+        $json = file_get_contents("php://input");
+        $data = Json::decode($json);
+        if (is_array($data)) {
+            if (isset($data['date']) && isset($data['type'])) {
+                $customWorkday = CustomWorkday::find()->where('user_id=:id AND date=:date',
+                    [
+                        ':date' => $data['date'],
+                        ':id'   => $id
+                    ])->one();
+                if (!$customWorkday) {
+                    $customWorkday = new CustomWorkday();
+                    $customWorkday->date = $data['date'];
+                    $customWorkday->user_id = $id;
+                    $customWorkday->create_user = \Yii::$app->user->id;
+                    $customWorkday->create_time = new \yii\db\Expression('NOW()');
+
+                }
+                $customWorkday->type = $data['type'] ? 'WORKING_DAY' : 'HOLIDAY';
+                $customWorkday->save();
+            }
         }
         echo "OK";
     }
@@ -782,6 +811,16 @@ class DefaultController extends Controller
                 'workDay'     => $item->type == RedLetterDay::WORKING_DAY,
                 'userWorkDay' => $item->type == RedLetterDay::WORKING_DAY,
             ];
+        }
+
+        $customWorkdays = CustomWorkday::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
+            [':year' => $year, ':month' => $month, ':userId' => $id])->all();
+
+        foreach ($customWorkdays as $item) {
+            $data['attendances'][$item->date] = ArrayHelper::merge($data['attendances'][$item->date],
+                [
+                    'userWorkDay'     => $item->type=='WORKING_DAY'
+                ]);
         }
 
         $absences = Absence::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',

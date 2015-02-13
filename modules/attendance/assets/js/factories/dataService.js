@@ -139,6 +139,29 @@
 
       };
 
+      var _setCustomWorkingDay = function (date, type, userId) {
+         var deferred = $q.defer();
+
+         var d = {
+            date: date,
+            type: type
+         };
+
+
+         $http({
+            url   : BASE_URL + 'attendance/default/set-custom-working-day/' + userId,
+            method: "POST",
+            data  : d
+         })
+            .then(function (result) {
+               deferred.resolve();
+            }, function () {
+               deferred.reject();
+            });
+         return deferred.promise;
+
+      };
+
 
       var _setAbsence = function (date, code, userId) {
          var deferred = $q.defer();
@@ -262,7 +285,8 @@
          setInstructorAttendance     : _setInstructorAttendance,
          getInstructorAttendance     : _getInstructorAttendance,
          getInstructorAttendanceValue: _getInstructorAttendanceValue,
-         getAbsencesClosedDay        : _getAbsencesClosedDay
+         getAbsencesClosedDay        : _getAbsencesClosedDay,
+         setCustomWorkingDay         : _setCustomWorkingDay
       };
    }
 

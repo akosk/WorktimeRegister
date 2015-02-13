@@ -113,9 +113,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
                     </td>
 
-                    <td>
-                        <div class="btn-group" ng-show="a.userWorkDay">
 
+                    <!-- Actions  -->
+
+                    <td>
+                        <div class="btn-group" ng-show="a.userWorkDay && a.workDay===true">
                             <button ng-show="(!ourData.isAbsencesClosed() || currentDateIsAfterAbsenceClose(a)) &&
                             !editDisabled && !ourData.isAttendancesClosed()" type="button"
                                     class="btn
@@ -132,6 +134,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             </ul>
                         </div>
+
+
                                     <span ng-show="isAdmin && a.workDay && helpers.isAfterCurrentMonth(a.date)"
                                           ng-click="setRedLetterDay(a)"
                                           class="btn btn-success btn-xs"
@@ -148,6 +152,22 @@ $this->params['breadcrumbs'][] = $this->title;
                                         <strong>M</strong>
                                     </span>
 
+                                    <span
+                                        ng-show="a.workDay===false && a.userWorkDay===false && !isInstructor"
+                                        ng-click="setCustomWorkingDay(a, true)"
+                                        class="btn btn-success btn-xs"
+                                        style="font-size:17px"
+                                        href="#" title="Dolgozom ezen a napon">
+                                            Dolgozom
+                                    </span>
+                                    <span
+                                        ng-show="a.workDay===false && a.userWorkDay===true && !isInstructor"
+                                        ng-click="setCustomWorkingDay(a, false)"
+                                        class="btn btn-success btn-xs"
+                                        style="font-size:17px"
+                                        href="#" title="Mégsem dolgozom ezen a napon">
+                                            Mégsem dolgozom
+                                    </span>
 
                                     <span ng-show="((!isUserOnFreeDay(a) && ((a.from!==null) || (a.to!==null))) ||
                                     (a.userAbsence!==undefined && (!ourData.isAbsencesClosed() ||

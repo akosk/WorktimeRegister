@@ -3,7 +3,7 @@
  */
 
 /*jshint loopfunc: true */
-/*global    isAdmin: true, isPayrollManager: true, isInstructor:true, isDepLeader:true, isDepAdmin:true,
+/*global    BASE_URL:true, isAdmin: true, isPayrollManager: true, isInstructor:true, isDepLeader:true, isDepAdmin:true,
  userId: true, editDisabled: true */
 
 
@@ -253,7 +253,27 @@
                $scope.isSave = false;
                $scope.focusedItem = null;
             });
+      };
 
+      $scope.setCustomWorkingDay= function (item, isWorkDay) {
+         $scope.focusedItem = item;
+         $scope.isSave = true;
+         dataService.setCustomWorkingDay(item.date, isWorkDay, $scope.userId)
+            .then(
+            function () {
+            },
+            function () {
+               //error
+               console.log("Cannot set custom working day!");
+            }
+         )
+            .then(function () {
+               item.from = null;
+               item.to = null;
+               item.userWorkDay = isWorkDay;
+               $scope.isSave = false;
+               $scope.focusedItem = null;
+            });
 
       };
 
