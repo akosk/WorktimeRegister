@@ -1,0 +1,31 @@
+{
+   "name"        : "worktimeregister",
+   "version"     : "0.0.0",
+   "authors"     : [
+      "Ákos Kiszely <akos.kiszely@gmail.com>"
+   ],
+   "license"     : "MIT",
+   "ignore"      : [
+      "**/.*",
+      "node_modules",
+      "bower_components",
+      "vendor/bower",
+      "test",
+      "tests"
+   ],
+   "dependencies": {
+      "angularjs"           : "~1.3.13",
+      "angular-route"       : "~1.3.13",
+      "angular-mocks"       : "~1.3.13",
+      "angular-sanitize"    : "~1.3.13",
+      "underscore"          : "~1.7.0",
+      "bootstrap": "*",
+      "bootstrap-sweetalert": "~0.4.3",
+      "fontawesome"         : "~4.3.0",
+      "jquery.inputmask"    : "*",
+      "punycode"     : "*",
+      "typeahead.js"        : "*",
+      "yii2-pjax"           : "*",
+      "jasmine"             : "*"
+   }
+}
