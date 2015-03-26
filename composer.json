@@ -23,7 +23,7 @@
         "yiisoft/yii2": "*",
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
-        "dektrium/yii2-user": "*",
+        "dektrium/yii2-user": "dev-master#42f1b8c6374453257438fc2ec819437569542dba",
         "kartik-v/yii2-widgets": "dev-master",
         "kartik-v/yii2-builder": "dev-master",
         "php-excel-reader/spreadsheet-reader": "dev-master",
