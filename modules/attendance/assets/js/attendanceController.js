@@ -141,7 +141,7 @@
 
                });
 
-            item.userWorkDay = item.workDay;
+            item.userWorkDay = true;
             delete item.userAbsence;
          }
       };
@@ -271,6 +271,7 @@
                item.from = null;
                item.to = null;
                item.userWorkDay = isWorkDay;
+               delete item.userAbsence;
                $scope.isSave = false;
                $scope.focusedItem = null;
             });
