@@ -94,6 +94,11 @@ FontawesomeAsset::register($this);
 
                 ]
             ],
+            [
+                'label'   => 'Felhasználói kézikönyv',
+                'url'     => '/files/EMR_UG.pdf',
+                'visible' => !Yii::$app->user->isGuest
+            ],
 
             Yii::$app->user->isGuest ?
                 ['label' => 'Bejelentkezés', 'url' => ['//user/security/login']] :
