@@ -97,7 +97,7 @@ FontawesomeAsset::register($this);
             [
                 'label'   => 'Felhasználói kézikönyv',
                 'url'     => '/files/EMR_UG.pdf',
-                'visible' => !Yii::$app->user->isGuest
+                'visible' => true
             ],
 
             Yii::$app->user->isGuest ?
