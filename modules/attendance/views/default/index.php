@@ -65,7 +65,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 </thead>
                 <tbody>
                 <tr ng-class="getRowBg(a)" ng-repeat="a in ourData.attendances" focus-time>
-                    <td>{{a|json}}</td>
                     <td style="max-width:50px">
                                     <span
                                         ng-class="helpers.isCurrentDay(a.date) ? 'bold':''">{{a.date | justDay}}</span>
