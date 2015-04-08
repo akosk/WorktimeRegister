@@ -63,9 +63,9 @@ FontawesomeAsset::register($this);
             [
                 'label'   => 'Adminisztráció',
                 'visible' =>    Yii::$app->user->can('admin') ||
-                                Yii::$app->user->can('dep_admin') ||
-                                Yii::$app->user->can('dep_leader') ||
-                                Yii::$app->user->can('payroll_manager'),
+                    Yii::$app->user->can('dep_admin') ||
+                    Yii::$app->user->can('dep_leader') ||
+                    Yii::$app->user->can('payroll_manager'),
                 'items'   => [
 
                     [

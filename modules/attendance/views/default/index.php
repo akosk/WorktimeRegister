@@ -117,7 +117,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     <!-- Actions  -->
 
                     <td>
-                        <div class="btn-group" ng-show="(a.userWorkDay && a.workDay===true) || (a.workDay===false && a.userWorkDay===true && !isInstructor)">
+                        <div class="btn-group"
+                             ng-show="a.userWorkDay || (a.userWorkDay===false && a.userAbsenceCode!==undefined)">
                             <button ng-show="(!ourData.isAbsencesClosed() || currentDateIsAfterAbsenceClose(a)) &&
                             !editDisabled && !ourData.isAttendancesClosed()" type="button"
                                     class="btn
@@ -153,7 +154,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </span>
 
                                     <span
-                                        ng-show="a.workDay===false && a.userWorkDay===false && !isInstructor"
+                                        ng-show="
+                                        a.workDay===false
+                                        && a.userWorkDay===false
+                                        && a.userAbsence===undefined
+                                        && !isInstructor"
+
+
                                         ng-click="setCustomWorkingDay(a, true)"
                                         class="btn btn-success btn-xs"
                                         style="font-size:17px"
@@ -161,7 +168,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                             Dolgozom
                                     </span>
                                     <span
-                                        ng-show="a.workDay===false && a.userWorkDay===true && !isInstructor"
+                                        ng-show="
+                                        a.workDay===false
+                                        &&
+                                        (a.userWorkDay===true || (a.userWorkDay===false && a.userAbsence!==undefined))
+                                        && !isInstructor"
                                         ng-click="setCustomWorkingDay(a, false)"
                                         class="btn btn-success btn-xs"
                                         style="font-size:17px"

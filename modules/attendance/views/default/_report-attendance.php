@@ -11,7 +11,7 @@ use app\modules\attendance\models\Absence;
 
 <div class="text-center">
     <h4>Jelenlét jelentés</h4>
-    <h4><strong><?= $user->profile->name ?> - <?= $year . ". " . $monthName ?></strong></h4>
+    <h5><strong><?= $user->profile->name ?> - <?= $year . ". " . $monthName ?></strong></h5>
     <h5><?= $user->profile->department->name ?></h5>
 </div>
 

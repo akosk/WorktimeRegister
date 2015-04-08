@@ -71,10 +71,8 @@ class DefaultController extends Controller
             throw new HttpException(403, 'Nincs jogosultsága az oldal megtekintéséhez!');
         }
 
-
         \Yii::$app->assetManager->forceCopy = true;
         AttendanceAsset::register($this->getView());
-
 
         $user = User::findOne($id);
         $currentUser = User::findOne(Yii::$app->user->id);
@@ -85,7 +83,6 @@ class DefaultController extends Controller
             'userRoles'   => Yii::$app->authManager->getRolesByUser($id)
         ]);
     }
-
 
     public function actionGetAttendances($id, $year, $month)
     {
@@ -124,7 +121,6 @@ class DefaultController extends Controller
             ) {
                 throw new HttpException(403, 'A hónap zárolva van.');
             }
-
         }
 
         foreach ($attendances AS $item) {
@@ -148,7 +144,6 @@ class DefaultController extends Controller
                 $attendance->start = $item['from'] ? $item['date'] . " " . $item['from'] : null;
                 $attendance->end = $item['to'] ? $item['date'] . " " . $item['to'] : null;
                 $attendance->save();
-
             }
         }
 
@@ -177,10 +172,11 @@ class DefaultController extends Controller
                 }
                 $redLetterDay->type = $data['type'];
                 $redLetterDay->save();
-            } else
+            } else {
                 if (isset($data['date']) && isset($data['delete'])) {
                     RedLetterDay::deleteAll('date=:date', [':date' => $data['date']]);
                 }
+            }
         }
         echo "OK";
     }
@@ -191,6 +187,10 @@ class DefaultController extends Controller
         $data = Json::decode($json);
         if (is_array($data)) {
             if (isset($data['date']) && isset($data['type'])) {
+                $rld = RedLetterDay::find()->where('date=:date',
+                    [
+                        ':date' => $data['date'],
+                    ])->one();
                 $customWorkday = CustomWorkday::find()->where('user_id=:id AND date=:date',
                     [
                         ':date' => $data['date'],
@@ -202,10 +202,23 @@ class DefaultController extends Controller
                     $customWorkday->user_id = $id;
                     $customWorkday->create_user = \Yii::$app->user->id;
                     $customWorkday->create_time = new \yii\db\Expression('NOW()');
-
                 }
                 $customWorkday->type = $data['type'] ? 'WORKING_DAY' : 'HOLIDAY';
-                $customWorkday->save();
+                if ($rld && $rld->type == $customWorkday->type) {
+                    $customWorkday->delete();
+                    Absence::deleteAll('user_id=:id AND date=:date',
+                        [
+                            ':date' => $data['date'],
+                            ':id'   => $id
+                        ]);
+                    Attendance::deleteAll('user_id=:id AND date=:date',
+                        [
+                            ':date' => $data['date'],
+                            ':id'   => $id
+                        ]);
+                } else {
+                    $customWorkday->save();
+                }
             }
         }
         echo "OK";
@@ -251,15 +264,10 @@ class DefaultController extends Controller
             $year = date('Y', $timestamp);
             $month = date('m', $timestamp);
 
-
             $this->checkIsMonthCompleted($id, $year, $month);
-
-
         }
 
-
         echo "OK";
-
     }
 
     public function actionRemoveAbsence($id)
@@ -275,7 +283,6 @@ class DefaultController extends Controller
                 ':user_id' => $id,
                 ':date'    => $data['date']]);
 
-
             $dtime = DateTime::createFromFormat("Y-m-d", $data['date']);
             $timestamp = $dtime->getTimestamp();
 
@@ -285,7 +292,6 @@ class DefaultController extends Controller
             $this->checkIsMonthCompleted($id, $year, $month);
         }
         echo "OK";
-
     }
 
     public function actionAdmin()
@@ -302,8 +308,9 @@ class DefaultController extends Controller
                 ':month'         => $month,
                 ':department_id' => $currentUser->profile->department->id,
             ])->one();
-        if (!$closeMonth) $closeMonth = new CloseMonth();
-
+        if (!$closeMonth) {
+            $closeMonth = new CloseMonth();
+        }
 
         $userSearch = new UserSearch();
         $userSearch->year = $year;
@@ -319,7 +326,6 @@ class DefaultController extends Controller
              ':department_id' => $currentUser->profile->department_id]
         )->queryScalar();
         $hasIncompleteUser = $db > 0;
-
 
         FontawesomeAsset::register($this->getView());
         BootstrapSweetAlertAsset::register($this->getView());
@@ -365,7 +371,6 @@ class DefaultController extends Controller
             'absenceReportUrl'     => $absenceReportUrl,
             'attendancesReportUrl' => $attendancesReportUrl
         ]);
-
     }
 
     public function beforeAction($action)
@@ -377,8 +382,9 @@ class DefaultController extends Controller
     private function checkIsMonthCompleted($id, $year, $month)
     {
         $userRoles = Yii::$app->authManager->getRolesByUser($id);
-        if ($userRoles['instructor']) return;
-
+        if ($userRoles['instructor']) {
+            return;
+        }
 
         if ($id && $year && $month) {
             $attendances = Attendance::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
@@ -443,14 +449,15 @@ class DefaultController extends Controller
 
     public function isWorkDay($date, $absence, $redLetterDay)
     {
-        if ($absence)
+        if ($absence) {
             return false;
-        if ($redLetterDay)
+        }
+        if ($redLetterDay) {
             return $redLetterDay->type == RedLetterDay::WORKING_DAY;
+        }
 
         $isWeekday = $date->format('N') < 6;
         return $isWeekday;
-
     }
 
     public function actionImport()
@@ -521,10 +528,7 @@ class DefaultController extends Controller
                 Yii::$app->getSession()->setFlash('error', "<strong>Hiba!</strong> {$count}/{$imported} felhasználó
                 került importálásra.");
             }
-
-
         }
-
 
         $userImportSearch = new UserImportSearch();
         $dataProvider = $userImportSearch->search(\Yii::$app->request->queryParams);
@@ -533,9 +537,7 @@ class DefaultController extends Controller
             'dataProvider'     => $dataProvider,
             'userImportSearch' => $userImportSearch,
         ]);
-
     }
-
 
     public function actionClose($year, $month, $target)
     {
@@ -608,7 +610,6 @@ class DefaultController extends Controller
                 $completion->save();
             }
         }
-
     }
 
     public function actionGetInstructorAttendance($id = null, $year, $month)
@@ -630,7 +631,6 @@ class DefaultController extends Controller
         ])->one();
 
         return Json::encode(['value' => $completion !== null]);
-
     }
 
     public function actionAddDepAdmin($id)
@@ -656,7 +656,6 @@ class DefaultController extends Controller
 
         $user = User::findOne($user_id);
 
-
         $aq = $user->getCompletionOfMonth($year, $month);
         $completion = $aq->one();
         $isCompleted = $completion != null;
@@ -664,7 +663,6 @@ class DefaultController extends Controller
         $data = $this->getReportData($user_id, $year, $month);
 
         $userRoles = Yii::$app->authManager->getRolesByUser($user_id);
-
 
         $content = $this->renderPartial('_report-attendance', [
             'user'              => $user,
@@ -693,8 +691,9 @@ class DefaultController extends Controller
                 ':month'         => $month,
                 ':department_id' => $currentUser->profile->department->id,
             ])->one();
-        if (!$closeMonth) $closeMonth = new CloseMonth();
-
+        if (!$closeMonth) {
+            $closeMonth = new CloseMonth();
+        }
 
         $userSearch = new UserSearch();
         $userSearch->year = $year;
@@ -723,9 +722,7 @@ class DefaultController extends Controller
                     'isCompleted'       => $isCompleted,
 
                 ]) . "<pagebreak />";
-
         }
-
 
         $pdf = $this->createPdf($content, 'jelenlet');
 
@@ -739,7 +736,6 @@ class DefaultController extends Controller
         }, 0);
 
         return round($total / 3600, 2);
-
     }
 
     public function actionReportHoliday($year, $month)
@@ -781,7 +777,9 @@ class DefaultController extends Controller
     public function hasRight($userId)
     {
         if ($userId !== null) {
-            if ($userId == Yii::$app->user->id) return true;
+            if ($userId == Yii::$app->user->id) {
+                return true;
+            }
 
             return Yii::$app->user->can('admin') ||
             Yii::$app->user->can('dep_admin') ||
@@ -819,7 +817,8 @@ class DefaultController extends Controller
         foreach ($customWorkdays as $item) {
             $data['attendances'][$item->date] = ArrayHelper::merge($data['attendances'][$item->date],
                 [
-                    'userWorkDay'     => $item->type=='WORKING_DAY'
+                    'date'        => $item->date,
+                    'userWorkDay' => $item->type == 'WORKING_DAY'
                 ]);
         }
 
@@ -839,7 +838,6 @@ class DefaultController extends Controller
         $attendances = Attendance::find()->where('YEAR(date)=:year AND MONTH(date)=:month AND user_id=:userId',
             [':year' => $year, ':month' => $month, ':userId' => $id])->all();
 
-
         foreach ($attendances AS $item) {
             if (!isset($data['attendances'][$item->date])
                 ||
@@ -855,7 +853,7 @@ class DefaultController extends Controller
                     'to'           => $item->end ? date("H:i", strtotime($item->end)) : null,
                     'ellapsedTime' => $ellapsedTime,
                     'worktime'     => $item->start && $item->end ?
-                         round($ellapsedTime/3600,2)
+                        round($ellapsedTime / 3600, 2)
                         :
                         null
                 ]);
@@ -909,7 +907,6 @@ class DefaultController extends Controller
             return $a['date'] < $b['date'] ? -1 : 1;
         });
 
-
         $days = cal_days_in_month(CAL_GREGORIAN, $month, $year);
         $iDay = 1;
         foreach ($data as $item) {
@@ -954,7 +951,7 @@ class DefaultController extends Controller
             // enhanced bootstrap css built by Krajee for mPDF formatting
             'cssFile'     => '@vendor/kartik-v/yii2-mpdf/assets/kv-mpdf-bootstrap.min.css',
             // any css to be embedded if required
-            'cssInline'   => '.kv-heading-1{font-size:18px} body {font-size:10px;}',
+            'cssInline'   => '.kv-heading-1{font-size:16px} body {font-size:9px;}',
             // set mPDF properties on the fly
             'options'     => ['title' => 'Munkaidő nyilvántartó'],
             // call mPDF methods on the fly
@@ -1013,8 +1010,9 @@ class DefaultController extends Controller
         }
 
         $filters = implode(' AND ', $filters);
-        if (strlen($filters) > 0) $filters = ' AND ' . $filters;
-
+        if (strlen($filters) > 0) {
+            $filters = ' AND ' . $filters;
+        }
 
         $q = "
             SELECT t.code, t.user_id, t.date, p.name, p.taxnumber, d.name AS department_name
