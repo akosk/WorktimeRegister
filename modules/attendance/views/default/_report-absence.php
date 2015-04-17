@@ -41,6 +41,12 @@ use app\modules\attendance\models\Absence;
         </tbody>
     </table>
 
+    <div>
+         Igazolom, hogy a fenti időszakban az egységnél
+            alkalmazott és a mulasztás jelentésen név szerint nem szerepeltetett
+            dolgozók munkaidejüket teljesítették, és a teljes havi illetményre jogosultak.
+    </div>
+
 <?php echo $this->render('_footer', [
     'signatureLeft'=>'Kitöltésért felelős',
     'signatureRight'=>'Szervezeti egység vezető',
