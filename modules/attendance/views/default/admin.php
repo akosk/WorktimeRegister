@@ -42,6 +42,7 @@ echo AlertBlock::widget([
     'type'            => AlertBlock::TYPE_ALERT
 ]);
 ?>
+    Figyelem, nagyon fontos, hogy 20-án csak a Távollétek zárolása gombot kell használni!
 
     <div class="row">
         <div class="col-md-12">
@@ -59,7 +60,10 @@ echo AlertBlock::widget([
                             dolgozó aki még nem fejezte be a jelenléti ív kitöltését.
                         </div>
                     <?php } ?>
-
+                    <div class="alert alert-danger" role="alert"><strong><i class="fa fa-exclamation-triangle"></i>
+                            Figyelem!</strong>
+                        Nagyon fontos, hogy 20-án csak a Távollétek zárolása gombot kell használni!
+                    </div>
 
                     <?php if ($closeMonth->attendances_closed != 1) { ?>
                         <button <?= $canCloseAttendance ?> id='attendances-close-btn' class="btn btn-danger">Jelenlétek
