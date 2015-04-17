@@ -1020,7 +1020,7 @@ class DefaultController extends Controller
             INNER JOIN user u ON u.id=t.user_id
             INNER JOIN profile p ON p.user_id=t.user_id
             INNER JOIN department d ON p.department_id=d.id
-            WHERE t.code {$holidaysOrNotSql} ('91001', '91003', '91004', '91011')
+            WHERE t.code {$holidaysOrNotSql} ('91001')
               AND YEAR(t.date)=:year AND MONTH(t.date)=:month
               {$filters}
             ORDER BY t.user_id, t.date
