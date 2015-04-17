@@ -30,7 +30,9 @@ class Absence extends \yii\db\ActiveRecord
         '91011' => 'RENDKÍVÜLI SZABADSÁG',
         '93001' => 'IGAZOLATLAN TÁVOLLÉT',
         '93009' => 'FELMENTÉSI IDŐ',
-        '93026' => 'IGAZOLT TÁVOLLÉT'
+        '93026' => 'IGAZOLT TÁVOLLÉT',
+        '93030' => 'CSÚSZTATÁS (TÚLÓRA/TÚLMUNKA MIATT)',
+        '93031' => 'PIHENŐNAP/SZABADNAP'
     ];
 
     /**

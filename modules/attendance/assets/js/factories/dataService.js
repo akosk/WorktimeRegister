@@ -35,7 +35,9 @@
          {id: '9', code: '91011', label: 'RENDKÍVÜLI SZABADSÁG'},
          {id: '10', code: '93001', label: 'IGAZOLATLAN TÁVOLLÉT'},
          {id: '11', code: '93009', label: 'FELMENTÉSI IDŐ'},
-         {id: '12', code: '93026', label: 'IGAZOLT TÁVOLLÉT'}
+         {id: '12', code: '93026', label: 'IGAZOLT TÁVOLLÉT'},
+         {id: '13', code: '93030', label: 'CSÚSZTATÁS (TÚLÓRA/TÚLMUNKA MIATT)'},
+         {id: '14', code: '93031', label: 'PIHENŐNAP/SZABADNAP'}
       ];
 
 
