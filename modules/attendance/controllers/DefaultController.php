@@ -770,8 +770,9 @@ class DefaultController extends Controller
 
     public function isContinous($absence, $row)
     {
+        $sameUser = $absence['taxnumber'] == $row['taxnumber'];
         return intval(substr($absence['date_to'], -2)) + 1 == intval(substr($row['date'],
-            -2)) && $absence['code'] == $row['code'];
+            -2)) && $absence['code'] == $row['code'] && $sameUser;
     }
 
     public function hasRight($userId)
