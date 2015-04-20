@@ -42,7 +42,7 @@ echo AlertBlock::widget([
     'type'            => AlertBlock::TYPE_ALERT
 ]);
 ?>
-    Figyelem, nagyon fontos, hogy 20-án csak a Távollétek zárolása gombot kell használni!
+
 
     <div class="row">
         <div class="col-md-12">
