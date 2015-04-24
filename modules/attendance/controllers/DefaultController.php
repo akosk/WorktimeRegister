@@ -52,6 +52,7 @@ class DefaultController extends Controller
                             'set-instructor-attendance', 'get-instructor-attendance',
                             'add-dep-admin', 'remove-dep-admin',
                             'report-attendance', 'report-attendances', 'report-holiday', 'report-absence',
+                            'report-holiday-after-close', 'report-absence-after-close',
                             'set-custom-working-day'
                         ],
                         'allow'   => true,
@@ -343,6 +344,19 @@ class DefaultController extends Controller
 
         ], $_GET));
 
+        $holidayReportAfterCloseUrl = Url::to(ArrayHelper::merge(
+            [
+                '/attendance/default/report-holiday-after-close',
+                'year'  => $year,
+                'month' => $month
+            ], $_GET));
+        $absenceReportAfterCloseUrl = Url::to(ArrayHelper::merge([
+            '/attendance/default/report-absence-after-close',
+            'year'  => $year,
+            'month' => $month
+
+        ], $_GET));
+
         $attendancesReportUrl = Url::to(ArrayHelper::merge([
             '/attendance/default/report-attendances',
             'year'  => $year,
@@ -369,6 +383,8 @@ class DefaultController extends Controller
                 Yii::$app->user->can('dep_admin')) ? '' : 'disabled',
             'holidayReportUrl'     => $holidayReportUrl,
             'absenceReportUrl'     => $absenceReportUrl,
+            'holidayReportAfterCloseUrl'     => $holidayReportAfterCloseUrl,
+            'absenceReportAfterCloseUrl'     => $absenceReportAfterCloseUrl,
             'attendancesReportUrl' => $attendancesReportUrl
         ]);
     }
@@ -754,6 +770,35 @@ class DefaultController extends Controller
     }
 
     public function actionReportAbsence($year, $month)
+    {
+        $aggregatedAbsences = $this->getAbsenceReport($year, $month, false);
+
+        $content = $this->renderPartial('_report-absence', [
+            'year'      => $year,
+            'monthName' => DateHelper::getMonthName($month),
+            'absences'  => $aggregatedAbsences
+        ]);
+
+        $pdf = $this->createPdf($content, 'tavollet');
+
+        return $pdf->render();
+    }
+    public function actionReportHolidayAfterClose($year, $month)
+    {
+        $aggregatedAbsences = $this->getAbsenceReport($year, $month, true);
+
+        $content = $this->renderPartial('_report-holiday', [
+            'year'      => $year,
+            'monthName' => DateHelper::getMonthName($month),
+            'absences'  => $aggregatedAbsences
+        ]);
+
+        $pdf = $this->createPdf($content, 'szabadsag');
+
+        return $pdf->render();
+    }
+
+    public function actionReportAbsenceAfterClose($year, $month)
     {
         $aggregatedAbsences = $this->getAbsenceReport($year, $month, false);
 
