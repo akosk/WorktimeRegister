@@ -61,15 +61,6 @@ echo AlertBlock::widget([
                         </div>
                     <?php } ?>
 
-
-                    <?php if ($closeMonth->attendances_closed != 1) { ?>
-                        <button <?= $canCloseAttendance ?> id='attendances-close-btn' class="btn btn-danger">Jelenlétek
-                            zárolása
-                        </button>
-                    <?php } else { ?>
-                        <span class="btn disabled"><i class="fa fa-lock" role="alert"></i> A jelenlétek zárolva.</span>
-                    <?php } ?>
-
                     <?php if ($closeMonth->absences_closed != 1) { ?>
                         <button <?= $canCloseAbsence ?> id='absences-close-btn' class="btn btn-danger"
                             >Távollétek zárolása
@@ -77,6 +68,15 @@ echo AlertBlock::widget([
                     <?php } else { ?>
                         <span class="btn disabled"><i class="fa fa-lock" role="alert"></i> A távollétek zárolva.</span>
                     <?php } ?>
+
+                    <?php if ($closeMonth->attendances_closed != 1 && $closeMonth->absences_closed == 1) { ?>
+                        <button <?= $canCloseAttendance ?> id='attendances-close-btn' class="btn btn-danger">Jelenlétek
+                            zárolása
+                        </button>
+                    <?php } else if( $closeMonth->attendances_closed == 1){ ?>
+                        <span class="btn disabled"><i class="fa fa-lock" role="alert"></i> A jelenlétek zárolva.</span>
+                    <?php } ?>
+
 
                 </div>
             </div>
