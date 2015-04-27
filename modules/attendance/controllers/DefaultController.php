@@ -237,13 +237,19 @@ class DefaultController extends Controller
 
             $currentUser = User::findOne($id);
 
-            if (CloseMonth::isAbsencesClosed(
+            $isAbsencesClosed = CloseMonth::isAbsencesClosed(
                 date("Y", strtotime($data['date'])),
                 date("n", strtotime($data['date'])),
                 $currentUser->profile->department->id
-            )
-            ) {
-                throw new HttpException(403, 'A hónap zárolva van.');
+            );
+
+            if ($isAbsencesClosed) {
+                $currentDay = date('j');
+                $absenceDay = date("n", strtotime($data['date']));
+                $isBeforeAbsenceClose = $currentDay >= $absenceDay;
+                if ($isBeforeAbsenceClose) {
+                    throw new HttpException(403, 'A hónap zárolva van.');
+                }
             }
 
             $absence = Absence::find()->where('user_id=:user_id && date=:date', [
@@ -365,27 +371,27 @@ class DefaultController extends Controller
         ], $_GET));
 
         return $this->render('admin', [
-            'dataProvider'         => $dataProvider,
-            'userSearch'           => $userSearch,
-            'currentUser'          => $currentUser,
-            'year'                 => $year,
-            'month'                => $month,
-            'monthName'            => DateHelper::getMonthName($month),
-            'nextMonthsYear'       => $month == 12 ? $year + 1 : $year,
-            'nextMonth'            => $month == 12 ? 1 : $month + 1,
-            'prevMonthsYear'       => $month == 1 ? $year - 1 : $year,
-            'prevMonth'            => $month == 1 ? 12 : $month - 1,
-            'hasIncompleteUser'    => $hasIncompleteUser,
-            'closeMonth'           => $closeMonth,
-            'canCloseAbsence'      => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
+            'dataProvider'               => $dataProvider,
+            'userSearch'                 => $userSearch,
+            'currentUser'                => $currentUser,
+            'year'                       => $year,
+            'month'                      => $month,
+            'monthName'                  => DateHelper::getMonthName($month),
+            'nextMonthsYear'             => $month == 12 ? $year + 1 : $year,
+            'nextMonth'                  => $month == 12 ? 1 : $month + 1,
+            'prevMonthsYear'             => $month == 1 ? $year - 1 : $year,
+            'prevMonth'                  => $month == 1 ? 12 : $month - 1,
+            'hasIncompleteUser'          => $hasIncompleteUser,
+            'closeMonth'                 => $closeMonth,
+            'canCloseAbsence'            => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
                 Yii::$app->user->can('dep_admin')) && DateHelper::alreadyLast($year, $month, 16) ? '' : 'disabled',
-            'canCloseAttendance'   => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
+            'canCloseAttendance'         => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
                 Yii::$app->user->can('dep_admin')) ? '' : 'disabled',
-            'holidayReportUrl'     => $holidayReportUrl,
-            'absenceReportUrl'     => $absenceReportUrl,
-            'holidayReportAfterCloseUrl'     => $holidayReportAfterCloseUrl,
-            'absenceReportAfterCloseUrl'     => $absenceReportAfterCloseUrl,
-            'attendancesReportUrl' => $attendancesReportUrl
+            'holidayReportUrl'           => $holidayReportUrl,
+            'absenceReportUrl'           => $absenceReportUrl,
+            'holidayReportAfterCloseUrl' => $holidayReportAfterCloseUrl,
+            'absenceReportAfterCloseUrl' => $absenceReportAfterCloseUrl,
+            'attendancesReportUrl'       => $attendancesReportUrl
         ]);
     }
 
@@ -783,6 +789,7 @@ class DefaultController extends Controller
 
         return $pdf->render();
     }
+
     public function actionReportHolidayAfterClose($year, $month)
     {
         $aggregatedAbsences = $this->getAbsenceReport($year, $month, true);
