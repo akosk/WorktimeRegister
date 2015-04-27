@@ -171,9 +171,9 @@ echo AlertBlock::widget([
             <a class="btn btn-success" href="<?=$absenceReportUrl?>"><i class="fa fa-file-pdf-o"></i> Távollét
                 jelentés 20-án</a>
             <a class="btn btn-success" href="<?=$holidayReportAfterCloseUrl?>"><i class="fa fa-file-pdf-o"></i> Szabadság
-                jelentés zárolás után</a>
+                jelentés hónap végén</a>
             <a class="btn btn-success" href="<?=$absenceReportAfterCloseUrl?>"><i class="fa fa-file-pdf-o"></i> Távollét
-                jelentés zárolás után</a>
+                jelentés hónap végén</a>
             <a class="btn btn-success" href="<?=$attendancesReportUrl?>"><i class="fa fa-file-pdf-o"></i> Jelenléti
                 ívek</a>
         </div>
