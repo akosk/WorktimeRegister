@@ -244,11 +244,17 @@ class DefaultController extends Controller
             );
 
             if ($isAbsencesClosed) {
-                $currentDay = date('j');
+                $closeMonth = CloseMonth::findCloseMonth(
+                    date("Y", strtotime($data['date'])),
+                    date("n", strtotime($data['date'])),
+                    $currentUser->profile->department->id
+                );
+
+                $closeDay = date('j',strtotime($closeMonth->absences_close_time));
                 $absenceDay = date("n", strtotime($data['date']));
-                $isBeforeAbsenceClose = $currentDay >= $absenceDay;
+                $isBeforeAbsenceClose = $closeDay > $absenceDay;
                 if ($isBeforeAbsenceClose) {
-                    throw new HttpException(403, 'A hónap zárolva van.');
+                    throw new HttpException(403, "A hónap zárolva van. (Zárolva: $closeDay Távollét: $absenceDay");
                 }
             }
 
