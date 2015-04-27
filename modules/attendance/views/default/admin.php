@@ -167,13 +167,13 @@ echo AlertBlock::widget([
         </div>
         <div class="panel-footer">
             <a class="btn btn-success" href="<?=$holidayReportUrl?>"><i class="fa fa-file-pdf-o"></i> Szabadság
-                jelentés</a>
+                jelentés 20-án</a>
             <a class="btn btn-success" href="<?=$absenceReportUrl?>"><i class="fa fa-file-pdf-o"></i> Távollét
-                jelentés</a>
+                jelentés 20-án</a>
             <a class="btn btn-success" href="<?=$holidayReportAfterCloseUrl?>"><i class="fa fa-file-pdf-o"></i> Szabadság
                 jelentés zárolás után</a>
             <a class="btn btn-success" href="<?=$absenceReportAfterCloseUrl?>"><i class="fa fa-file-pdf-o"></i> Távollét
-                jelentés zásolás után</a>
+                jelentés zárolás után</a>
             <a class="btn btn-success" href="<?=$attendancesReportUrl?>"><i class="fa fa-file-pdf-o"></i> Jelenléti
                 ívek</a>
         </div>
