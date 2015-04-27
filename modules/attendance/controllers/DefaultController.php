@@ -251,7 +251,7 @@ class DefaultController extends Controller
                 );
 
                 $closeDay = date('j',strtotime($closeMonth->absences_close_time));
-                $absenceDay = date("n", strtotime($data['date']));
+                $absenceDay = date("j", strtotime($data['date']));
                 $isBeforeAbsenceClose = $closeDay > $absenceDay;
                 if ($isBeforeAbsenceClose) {
                     throw new HttpException(403, "A hónap zárolva van. (Zárolva: $closeDay Távollét: $absenceDay");
