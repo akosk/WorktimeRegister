@@ -1070,6 +1070,14 @@ class DefaultController extends Controller
             }
         }
 
+        if( $difference ) {
+
+            if ((Yii::$app->user->can('admin') || Yii::$app->user->can('payroll_manager'))) {
+                $currentUser = User::findOne(\Yii::$app->user->id);
+                $params[':department_id'] = $currentUser->profile->department_id;
+                $filters[] = 'p.department_id=:department_id';
+            }
+        }
         $filters = implode(' AND ', $filters);
         if (strlen($filters) > 0) {
             $filters = ' AND ' . $filters;
@@ -1079,13 +1087,6 @@ class DefaultController extends Controller
         $difference_filter = "";
 
         if( $difference ){
-
-            if ((Yii::$app->user->can('admin') || Yii::$app->user->can('payroll_manager'))) {
-                $currentUser = User::findOne(\Yii::$app->user->id);
-                $params[':department_id'] = $currentUser->profile->department_id;
-                $filters[] = 'p.department_id=:department_id';
-            }
-
 
             $isAbsencesClosed = CloseMonth::isAbsencesClosed(
                 $year,
