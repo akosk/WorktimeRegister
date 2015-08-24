@@ -365,7 +365,8 @@ class DefaultController extends Controller
         $absenceReportAfterCloseUrl = Url::to(ArrayHelper::merge([
             '/attendance/default/report-absence-after-close',
             'year'  => $year,
-            'month' => $month
+            'month' => $month,
+            'sort'=>'profile.name'
 
         ], $_GET));
 
@@ -726,6 +727,7 @@ class DefaultController extends Controller
         $userSearch = new UserSearch();
         $userSearch->year = $year;
         $userSearch->month = $month;
+
         $dataProvider = $userSearch->search(\Yii::$app->request->queryParams);
 
         $users = $dataProvider->getModels();
@@ -1082,7 +1084,7 @@ class DefaultController extends Controller
             WHERE t.code {$holidaysOrNotSql} ('91001')
               AND YEAR(t.date)=:year AND MONTH(t.date)=:month
               {$filters}
-            ORDER BY t.user_id, t.date
+            ORDER BY p.name, t.date
         ";
 
         $absences = Yii::$app->db->createCommand($q, $params)->queryAll();
