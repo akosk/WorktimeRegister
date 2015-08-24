@@ -250,7 +250,7 @@ class DefaultController extends Controller
                     $currentUser->profile->department->id
                 );
 
-                $closeDay = date('j',strtotime($closeMonth->absences_close_time));
+                $closeDay = date('j', strtotime($closeMonth->absences_close_time));
                 $absenceDay = date("j", strtotime($data['date']));
                 $isBeforeAbsenceClose = $closeDay > $absenceDay;
                 if ($isBeforeAbsenceClose) {
@@ -366,7 +366,7 @@ class DefaultController extends Controller
             '/attendance/default/report-absence-after-close',
             'year'  => $year,
             'month' => $month,
-            'sort'=>'profile.name'
+            'sort'  => 'profile.name'
 
         ], $_GET));
 
@@ -770,7 +770,7 @@ class DefaultController extends Controller
 
     public function actionReportHoliday($year, $month)
     {
-        $aggregatedAbsences = $this->getAbsenceReport($year, $month, true, false );
+        $aggregatedAbsences = $this->getAbsenceReport($year, $month, true, false);
 
         $content = $this->renderPartial('_report-holiday', [
             'year'      => $year,
@@ -785,7 +785,7 @@ class DefaultController extends Controller
 
     public function actionReportAbsence($year, $month)
     {
-        $aggregatedAbsences = $this->getAbsenceReport($year, $month, false, false );
+        $aggregatedAbsences = $this->getAbsenceReport($year, $month, false, false);
 
         $content = $this->renderPartial('_report-absence', [
             'year'      => $year,
@@ -800,7 +800,7 @@ class DefaultController extends Controller
 
     public function actionReportHolidayAfterClose($year, $month)
     {
-            $aggregatedAbsences = $this->getAbsenceReport($year, $month, true, true );
+        $aggregatedAbsences = $this->getAbsenceReport($year, $month, true, true);
 
         $content = $this->renderPartial('_report-holiday', [
             'year'      => $year,
@@ -815,7 +815,7 @@ class DefaultController extends Controller
 
     public function actionReportAbsenceAfterClose($year, $month)
     {
-        $aggregatedAbsences = $this->getAbsenceReport($year, $month, false, true );
+        $aggregatedAbsences = $this->getAbsenceReport($year, $month, false, true);
 
         $content = $this->renderPartial('_report-absence', [
             'year'      => $year,
@@ -1031,7 +1031,7 @@ class DefaultController extends Controller
      * @param $difference Determines whether the report is difference list or not.
      * @return array
      */
-    public function getAbsenceReport($year, $month, $holidays = false, $difference = false )
+    public function getAbsenceReport($year, $month, $holidays = false, $difference = false)
     {
         $holidaysOrNotSql = '';
         if ($holidays) {
@@ -1046,8 +1046,9 @@ class DefaultController extends Controller
             ":month" => $month
         ];
 
+        $currentUser = User::findOne(\Yii::$app->user->id);
+
         if (!(Yii::$app->user->can('admin') || Yii::$app->user->can('payroll_manager'))) {
-            $currentUser = User::findOne(\Yii::$app->user->id);
             $params[':department_id'] = $currentUser->profile->department_id;
             $filters[] = 'p.department_id=:department_id';
         }
@@ -1072,24 +1073,7 @@ class DefaultController extends Controller
             }
         }
 
-        if( $difference ) {
-
-            if ((Yii::$app->user->can('admin') || Yii::$app->user->can('payroll_manager'))) {
-                $currentUser = User::findOne(\Yii::$app->user->id);
-                $params[':department_id'] = $currentUser->profile->department_id;
-                $filters[] = 'p.department_id=:department_id';
-            }
-        }
-        $filters = implode(' AND ', $filters);
-        if (strlen($filters) > 0) {
-            $filters = ' AND ' . $filters;
-        }
-
-        // This section is to handle the difference reports between the absence closing and the end of the month
-        $difference_filter = "";
-
-        if( $difference ){
-
+        if ($difference) {
             $isAbsencesClosed = CloseMonth::isAbsencesClosed(
                 $year,
                 $month,
@@ -1102,24 +1086,20 @@ class DefaultController extends Controller
                     $month,
                     $currentUser->profile->department->id
                 );
-
                 $closeDay = date('d',strtotime($closeMonth->absences_close_time));
-                $closeDate=$year."-".$month."-".$closeDay;
-                $q = "
-                SELECT t.code, t.user_id, t.date, p.name, p.taxnumber, d.name AS department_name
-                  FROM absence t
-                  INNER JOIN user u ON u.id=t.user_id
-                  INNER JOIN profile p ON p.user_id=t.user_id
-                  INNER JOIN department d ON p.department_id=d.id
-                  WHERE t.code {$holidaysOrNotSql} ('91001')
-                  AND YEAR(t.date)=:year AND MONTH(t.date)=:month AND DATE(t.create_time)>'{$closeDate}'
-                  {$filters}
-                 ORDER BY p.name, t.date
-                ";
+
+                $filters[]='DATE(t.create_time)>:closeDate';
+                $params[':closeDate']=$year."-".$month."-".$closeDay;
 
             }
-        }else{
-            $q = "
+        }
+
+        $filters = implode(' AND ', $filters);
+        if (strlen($filters) > 0) {
+            $filters = ' AND ' . $filters;
+        }
+
+        $q = "
             SELECT t.code, t.user_id, t.date, p.name, p.taxnumber, d.name AS department_name
             FROM absence t
             INNER JOIN user u ON u.id=t.user_id
@@ -1130,10 +1110,6 @@ class DefaultController extends Controller
               {$filters}
             ORDER BY p.name, t.date
         ";
-        }
-        // end of the difference section
-
-
 
         $absences = Yii::$app->db->createCommand($q, $params)->queryAll();
         $aggregatedAbsences = [];
