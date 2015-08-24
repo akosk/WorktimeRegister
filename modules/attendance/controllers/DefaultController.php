@@ -1114,7 +1114,7 @@ class DefaultController extends Controller
                   WHERE t.code {$holidaysOrNotSql} ('91001')
                   AND YEAR(t.date)=:year AND MONTH(t.date)=:month AND DATE(t.create_time)>'{$closeDate}'
                   {$filters}
-                 ORDER BY t.user_id, t.date
+                 ORDER BY p.name, t.date
                 ";
 
             }
