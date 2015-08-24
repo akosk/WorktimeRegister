@@ -831,8 +831,30 @@ class DefaultController extends Controller
     public function isContinous($absence, $row)
     {
         $sameUser = $absence['taxnumber'] == $row['taxnumber'];
-        return intval(substr($absence['date_to'], -2)) + 1 == intval(substr($row['date'],
-            -2)) && $absence['code'] == $row['code'] && $sameUser;
+        $nextday = $this->rollToNextWorkday($absence['date_to']);
+        $nextday = intval(substr($nextday, -2));
+        $day = intval(substr($row['date'], -2));
+
+        return $nextday == $day && $absence['code'] == $row['code'] && $sameUser;
+    }
+
+    public function rollToNextWorkday($date)
+    {
+        $dtime = DateTime::createFromFormat("Y-m-d", $date);
+        if (!$dtime instanceof DateTime) return '0000-00-00';
+        do {
+            $dtime->add(new DateInterval('P1D'));
+            $redLetterDay = RedLetterDay::find()->where('date=:date', [':date' => $dtime->format('Y-m-d')])->one();
+
+            $isWorkDay = false;
+            if ($redLetterDay) {
+                $isWorkDay = $redLetterDay->type == RedLetterDay::WORKING_DAY;
+            } else {
+                $isWorkDay = $dtime->format('N') < 6;
+            }
+        } while (!$isWorkDay);
+
+        return $dtime->format('Y-m-d');
     }
 
     public function hasRight($userId)
@@ -1086,11 +1108,10 @@ class DefaultController extends Controller
                     $month,
                     $currentUser->profile->department->id
                 );
-                $closeDay = date('d',strtotime($closeMonth->absences_close_time));
+                $closeDay = date('d', strtotime($closeMonth->absences_close_time));
 
-                $filters[]='DATE(t.create_time)>:closeDate';
-                $params[':closeDate']=$year."-".$month."-".$closeDay;
-
+                $filters[] = 'DATE(t.create_time)>:closeDate';
+                $params[':closeDate'] = $year . "-" . $month . "-" . $closeDay;
             }
         }
 
@@ -1124,14 +1145,14 @@ class DefaultController extends Controller
                     $aggregatedAbsences[] = $currentAbsence;
                 }
                 $currentAbsence = [
-                    'code'            => $row['code'],
-                    'name'            => $row['name'],
-                    'taxnumber'       => $row['taxnumber'],
-                    'department_name' => $row['department_name'],
-                    'department_full_name' => $row['department_name']." [".$row['department_code']."]",
-                    'date_from'       => $row['date'],
-                    'date_to'         => $row['date'],
-                    'days'            => 1,
+                    'code'                 => $row['code'],
+                    'name'                 => $row['name'],
+                    'taxnumber'            => $row['taxnumber'],
+                    'department_name'      => $row['department_name'],
+                    'department_full_name' => $row['department_name'] . " [" . $row['department_code'] . "]",
+                    'date_from'            => $row['date'],
+                    'date_to'              => $row['date'],
+                    'days'                 => 1,
                 ];
             }
         }
