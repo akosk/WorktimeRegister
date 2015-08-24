@@ -1100,7 +1100,8 @@ class DefaultController extends Controller
         }
 
         $q = "
-            SELECT t.code, t.user_id, t.date, p.name, p.taxnumber, d.name AS department_name
+            SELECT t.code, t.user_id, t.date, p.name, p.taxnumber, d.name AS department_name,
+              d.code AS department_code
             FROM absence t
             INNER JOIN user u ON u.id=t.user_id
             INNER JOIN profile p ON p.user_id=t.user_id
@@ -1127,6 +1128,7 @@ class DefaultController extends Controller
                     'name'            => $row['name'],
                     'taxnumber'       => $row['taxnumber'],
                     'department_name' => $row['department_name'],
+                    'department_full_name' => $row['department_name']." [".$row['department_code']."]",
                     'date_from'       => $row['date'],
                     'date_to'         => $row['date'],
                     'days'            => 1,

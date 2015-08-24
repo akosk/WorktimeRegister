@@ -30,7 +30,7 @@ use app\modules\attendance\models\Absence;
         <tr>
             <td><?= $item['name'] ?></td>
             <td><?= $item['taxnumber'] ?></td>
-            <td><?= $item['department_name'] ?></td>
+            <td><?= $item['department_full_name'] ?></td>
             <td><?= $item['date_from'] ?></td>
             <td><?= $item['date_to'] ?></td>
             <td><?= $item['days'] ?></td>
