@@ -1110,8 +1110,12 @@ class DefaultController extends Controller
                 );
                 $closeDay = date('d', strtotime($closeMonth->absences_close_time));
 
+                $date = new DateTime();
+                $date->setDate($year, $month, $closeDay);
+                $closeDate= $date->format('Y-m-d');
+
                 $filters[] = 'DATE(t.create_time)>:closeDate';
-                $params[':closeDate'] = $year . "-" . $month . "-" . $closeDay;
+                $params[':closeDate'] = $closeDate;
             }
         }
 
