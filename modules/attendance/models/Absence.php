@@ -32,7 +32,8 @@ class Absence extends \yii\db\ActiveRecord
         '93009' => 'FELMENTÉSI IDŐ',
         '93026' => 'IGAZOLT TÁVOLLÉT',
         '93030' => 'CSÚSZTATÁS (TÚLÓRA/TÚLMUNKA MIATT)',
-        '93031' => 'PIHENŐNAP/SZABADNAP'
+        '93031' => 'PIHENŐNAP/SZABADNAP',
+        '93032' => 'TOVÁBBKÉPZÉS, BELFÖLDI KIKÜLDETÉS',
     ];
 
     /**
