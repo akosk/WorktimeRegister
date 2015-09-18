@@ -21,24 +21,36 @@ if ($isInstructor) {
     echo $this->render('_report_attendance_instructor', [
         'isCompleted' => $isCompleted
     ]);
+
+    if (!empty($absences)) {
+        echo $this->render('_report-absence-instructor', [
+            'absences' => $absences,
+        ]);
+    }
+
+    if (!empty($holidays)) {
+        echo $this->render('_report-holiday-instructor', [
+            'holidays' => $holidays,
+        ]);
+    }
 } else {
     echo $this->render('_report_attendance_worker', [
-        'attendances' => $attendances,
+        'attendances'       => $attendances,
         'totalEllapsedTime' => $totalEllapsedTime
     ]);
-
 }
 ?>
 
 <div>
-    <strong> Alulírott <?=$user->profile->name ?> kijelentem, hogy a munkaidőmet a fenti időszakra teljesítettem.</strong>
+    <strong> Alulírott <?= $user->profile->name ?> kijelentem, hogy a munkaidőmet a fenti időszakra
+        teljesítettem.</strong>
 </div>
 
 
 <?php
-echo $this->render('_footer',[
-    'signatureLeft'=>'Szervezeti egység vezető',
-    'signatureRight'=>'Dolgozó',
+echo $this->render('_footer', [
+    'signatureLeft'  => 'Szervezeti egység vezető',
+    'signatureRight' => 'Dolgozó',
 ]);
 ?>
 

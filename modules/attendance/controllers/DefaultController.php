@@ -690,6 +690,8 @@ class DefaultController extends Controller
         $isCompleted = $completion != null;
 
         $data = $this->getReportData($user_id, $year, $month);
+        $absenceData = $this->getAbsenceReport($year, $month, false, false, $user_id);
+        $holidays = $this->getAbsenceReport($year, $month, true, false, $user_id);
 
         $userRoles = Yii::$app->authManager->getRolesByUser($user_id);
 
@@ -699,6 +701,8 @@ class DefaultController extends Controller
             'year'              => $year,
             'monthName'         => DateHelper::getMonthName($month),
             'attendances'       => $data,
+            'absences'          => $absenceData,
+            'holidays'          => $holidays,
             'totalEllapsedTime' => $this->sumEllapsedTimeInHour($data),
             'isCompleted'       => $isCompleted,
 
@@ -740,6 +744,8 @@ class DefaultController extends Controller
             $isCompleted = $completion != null;
 
             $data = $this->getReportData($user->id, $year, $month);
+            $absenceData = $this->getAbsenceReport($year, $month, false, false, $user->id);
+            $holidays = $this->getAbsenceReport($year, $month, true, false, $user->id);
 
             $userRoles = Yii::$app->authManager->getRolesByUser($user->id);
             $content .= $this->renderPartial('_report-attendance', [
@@ -748,6 +754,8 @@ class DefaultController extends Controller
                     'year'              => $year,
                     'monthName'         => DateHelper::getMonthName($month),
                     'attendances'       => $data,
+                    'absences'          => $absenceData,
+                    'holidays'          => $holidays,
                     'totalEllapsedTime' => $this->sumEllapsedTimeInHour($data),
                     'isCompleted'       => $isCompleted,
 
@@ -841,7 +849,9 @@ class DefaultController extends Controller
     public function rollToNextWorkday($date)
     {
         $dtime = DateTime::createFromFormat("Y-m-d", $date);
-        if (!$dtime instanceof DateTime) return '0000-00-00';
+        if (!$dtime instanceof DateTime) {
+            return '0000-00-00';
+        }
         do {
             $dtime->add(new DateInterval('P1D'));
             $redLetterDay = RedLetterDay::find()->where('date=:date', [':date' => $dtime->format('Y-m-d')])->one();
@@ -1053,7 +1063,7 @@ class DefaultController extends Controller
      * @param $difference Determines whether the report is difference list or not.
      * @return array
      */
-    public function getAbsenceReport($year, $month, $holidays = false, $difference = false)
+    public function getAbsenceReport($year, $month, $holidays = false, $difference = false, $user_id = null)
     {
         $holidaysOrNotSql = '';
         if ($holidays) {
@@ -1095,6 +1105,11 @@ class DefaultController extends Controller
             }
         }
 
+        if ($user_id) {
+            $params[':user_id'] = $user_id;
+            $filters[] = 'u.id = :user_id';
+        }
+
         if ($difference) {
             $isAbsencesClosed = CloseMonth::isAbsencesClosed(
                 $year,
@@ -1112,7 +1127,7 @@ class DefaultController extends Controller
 
                 $date = new DateTime();
                 $date->setDate($year, $month, $closeDay);
-                $closeDate= $date->format('Y-m-d');
+                $closeDate = $date->format('Y-m-d');
 
                 $filters[] = 'DATE(t.create_time)>:closeDate';
                 $params[':closeDate'] = $closeDate;
