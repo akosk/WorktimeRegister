@@ -38,7 +38,7 @@
          {id: '12', code: '93026', label: 'IGAZOLT TÁVOLLÉT'},
          {id: '13', code: '93030', label: 'CSÚSZTATÁS (TÚLÓRA/TÚLMUNKA MIATT)'},
          {id: '14', code: '93031', label: 'PIHENŐNAP/SZABADNAP'},
-         {id: '15', code: '93032', label: 'TOVÁBBKÉPZÉS, BELFÖLDI KIKÜLDETÉS'}
+         {id: '15', code: '93032', label: 'KIKÜLDETÉS'}
       ];
 
 
