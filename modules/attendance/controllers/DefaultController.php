@@ -391,7 +391,7 @@ class DefaultController extends Controller
             'hasIncompleteUser'          => $hasIncompleteUser,
             'closeMonth'                 => $closeMonth,
             'canCloseAbsence'            => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
-                Yii::$app->user->can('dep_admin')) && DateHelper::alreadyLast($year, $month, 15) ? '' : 'disabled',
+                Yii::$app->user->can('dep_admin')) && DateHelper::alreadyLast($year, $month, 8) ? '' : 'disabled',
             'canCloseAttendance'         => (Yii::$app->user->can('admin') || Yii::$app->user->can('dep_leader') ||
                 Yii::$app->user->can('dep_admin')) ? '' : 'disabled',
             'holidayReportUrl'           => $holidayReportUrl,
