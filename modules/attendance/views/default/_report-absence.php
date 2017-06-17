@@ -52,10 +52,8 @@ if( strlen($szervezeti_egyseg_vezeto)>0 ){
     <div>
         Igazolom, hogy <?=$year?>. év <?=$monthName?> hónapban a(z) <?=$szervezeti_egyseg_nev?> vezetője (<?=$szervezeti_egyseg_vezeto?>) havi munkaidejét teljesítette, a teljes havi illetményre jogosult.
     </div>
-
 <?php
 }
-
 //$szervezeti_egyseg_nev = "Z";
 
 ?>
