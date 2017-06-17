@@ -46,7 +46,19 @@ use app\modules\attendance\models\Absence;
             alkalmazott és a mulasztás jelentésen név szerint nem szerepeltetett
             dolgozók munkaidejüket teljesítették, és a teljes havi illetményre jogosultak.
     </div>
+<?php
+if( strlen($szervezeti_egyseg_vezeto)>0 ){
+?>
+    <div>
+        Igazolom, hogy <?=$year?>. év <?=$monthName?> hónapban a(z) <?=$szervezeti_egyseg_nev?> vezetője (<?=$szervezeti_egyseg_vezeto?>) havi munkaidejét teljesítette, a teljes havi illetményre jogosult.
+    </div>
 
+<?php
+}
+
+//$szervezeti_egyseg_nev = "Z";
+
+?>
 <?php echo $this->render('_footer', [
     'signatureLeft'=>'Kitöltésért felelős',
     'signatureRight'=>'Szervezeti egység vezető',

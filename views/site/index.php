@@ -13,7 +13,7 @@ $this->title = 'Főoldal';
 
         <div class="row">
             <div class="col-md-4 col-md-offset-4">
-                <img class="img-responsive" src="http://www.uni-miskolc.hu/template/web/img/logo-uni-miskolc.png" alt="Miskolci
+                <img class="img-responsive" src="/img/logo-uni-miskolc.png" alt="Miskolci
                 Egyetem"/>
 
             </div>

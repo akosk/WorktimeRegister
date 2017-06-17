@@ -795,11 +795,16 @@ class DefaultController extends Controller
     {
         $aggregatedAbsences = $this->getAbsenceReport($year, $month, false, false);
 
+        $szervezeti_egyseg_vezeto = "XY";
+        $szervezeti_egyseg_nev = "Z";
         $content = $this->renderPartial('_report-absence', [
             'year'      => $year,
             'monthName' => DateHelper::getMonthName($month),
-            'absences'  => $aggregatedAbsences
+            'absences'  => $aggregatedAbsences,
+            'szervezeti_egyseg_vezeto' => $szervezeti_egyseg_vezeto,
+            'szervezeti_egyseg_nev' => $szervezeti_egyseg_nev
         ]);
+
 
         $pdf = $this->createPdf($content, 'tavollet');
 
@@ -824,11 +829,14 @@ class DefaultController extends Controller
     public function actionReportAbsenceAfterClose($year, $month)
     {
         $aggregatedAbsences = $this->getAbsenceReport($year, $month, false, true);
-
+        $szervezeti_egyseg_vezeto = "XY";
+        $szervezeti_egyseg_nev = "Z";
         $content = $this->renderPartial('_report-absence', [
             'year'      => $year,
             'monthName' => DateHelper::getMonthName($month),
-            'absences'  => $aggregatedAbsences
+            'absences'  => $aggregatedAbsences,
+            'szervezeti_egyseg_vezeto' => $szervezeti_egyseg_vezeto,
+            'szervezeti_egyseg_nev' => $szervezeti_egyseg_nev
         ]);
 
         $pdf = $this->createPdf($content, 'tavollet');
