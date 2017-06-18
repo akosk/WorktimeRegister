@@ -46,11 +46,18 @@ use app\modules\attendance\models\Absence;
             alkalmazott és a mulasztás jelentésen név szerint nem szerepeltetett
             dolgozók munkaidejüket teljesítették, és a teljes havi illetményre jogosultak.
     </div>
+<?php foreach ($vezetok as $item) { ?>
+    <tr>
+        <td><?= $item['name'] ?></td>
+        <td><?= $item['taxnumber'] ?></td>
+    </tr>
+<?php } ?>
+
 <?php
-if( strlen($szervezeti_egyseg_vezeto)>0 ){
+foreach ($vezetok as $item){
 ?>
     <div>
-        Igazolom, hogy <?=$year?>. év <?=$monthName?> hónapban a(z) <?=$szervezeti_egyseg_nev?> vezetője (<?=$szervezeti_egyseg_vezeto?>) havi munkaidejét teljesítette, a teljes havi illetményre jogosult.
+        Igazolom, hogy <?=$year?>. év <?=$monthName?> hónapban a(z) <?=$item['szervezeti_egyseg']?> vezetője (<?=$item['nev']?>) havi munkaidejét teljesítette, a teljes havi illetményre jogosult.
     </div>
 <?php
 }
