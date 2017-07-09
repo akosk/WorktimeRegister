@@ -10,9 +10,24 @@ use app\modules\attendance\models\Absence;
 
 ?>
 
+<?php
+$szervezeti_egyseg="";
+foreach ($vezetok as $item){
+    if(strlen($szervezeti_egyseg)>0){
+        $szervezeti_egyseg=$szervezeti_egyseg.", ";
+    }
+    $szervezeti_egyseg=$szervezeti_egyseg.$item['szervezeti_egyseg'];
+}
+//$szervezeti_egyseg_nev = "Z";
+if(strlen($szervezeti_egyseg)>0){
+    $szervezeti_egyseg="(".$szervezeti_egyseg.")";
+}
+
+?>
+
     <div class="text-center">
         <h4>Távollét jelentés</h4>
-        <h4><strong><?= $year . ". " . $monthName ?></strong></h4>
+        <h4><strong><?= $year . ". " . $monthName." ".$szervezeti_egyseg ?></strong></h4>
     </div>
     <table class="table table-condensed table-bordered">
         <thead>
@@ -46,13 +61,16 @@ use app\modules\attendance\models\Absence;
             alkalmazott és a mulasztás jelentésen név szerint nem szerepeltetett
             dolgozók munkaidejüket teljesítették, és a teljes havi illetményre jogosultak.
     </div>
-<?php foreach ($vezetok as $item) { ?>
-    <tr>
-        <td><?= $item['name'] ?></td>
-        <td><?= $item['taxnumber'] ?></td>
-    </tr>
-<?php } ?>
 
+<?php echo $this->render('_footer', [
+    'signatureLeft'=>'Kitöltésért felelős',
+    'signatureRight'=>'Szervezeti egység vezető',
+]); ?>
+
+
+<div>
+<br><br>
+</div>
 <?php
 foreach ($vezetok as $item){
 ?>
@@ -60,11 +78,11 @@ foreach ($vezetok as $item){
         Igazolom, hogy <?=$year?>. év <?=$monthName?> hónapban a(z) <?=$item['szervezeti_egyseg']?> vezetője (<?=$item['nev']?>) havi munkaidejét teljesítette, a teljes havi illetményre jogosult.
     </div>
 <?php
+    echo $this->render('_footer', [
+        'signatureLeft'=>'Kitöltésért felelős',
+        'signatureRight'=>'Gazdálkodási egység vezető/munkáltatói jogkör gyakorlója',
+    ]);
 }
 //$szervezeti_egyseg_nev = "Z";
 
 ?>
-<?php echo $this->render('_footer', [
-    'signatureLeft'=>'Kitöltésért felelős',
-    'signatureRight'=>'Szervezeti egység vezető',
-]); ?>

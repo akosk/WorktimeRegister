@@ -794,7 +794,7 @@ class DefaultController extends Controller
     public function actionReportAbsence($year, $month)
     {
         $aggregatedAbsences = $this->getAbsenceReport($year, $month, false, false);
-        $vezetok=getSzervezetiEgysegVezeto();
+        $vezetok=$this->getSzervezetiEgysegVezeto();
 
         $content = $this->renderPartial('_report-absence', [
             'year'      => $year,
@@ -827,7 +827,7 @@ class DefaultController extends Controller
     public function actionReportAbsenceAfterClose($year, $month)
     {
         $aggregatedAbsences = $this->getAbsenceReport($year, $month, false, true);
-        $vezetok=getSzervezetiEgysegVezeto();
+        $vezetok=$this->getSzervezetiEgysegVezeto();
 
         $content = $this->renderPartial('_report-absence', [
             'year'      => $year,
@@ -1266,8 +1266,8 @@ class DefaultController extends Controller
               FROM
                 profile
             INNER JOIN department ON (profile.department_id = department.id)
-            INNER JOIN auth_assignment ON ( profile.user_id = (auth_assignment.user_id+0) AND auth_assignment.item_name='dep_admin' )
-            where {$filters}
+            INNER JOIN auth_assignment ON ( profile.user_id = (auth_assignment.user_id+0) AND auth_assignment.item_name='dep_leader' )
+            where 1=1 {$filters}
         ";
 
         $vezetok = Yii::$app->db->createCommand($q, $params)->queryAll();
@@ -1285,4 +1285,55 @@ class DefaultController extends Controller
         return $aggregatedVezetok;
     }
 
+/*    public function getSzervezetiEgyseg(){
+
+        $filters = [];
+        $params = [];
+
+        $currentUser = User::findOne(\Yii::$app->user->id);
+
+        if (!(Yii::$app->user->can('admin') || Yii::$app->user->can('payroll_manager'))) {
+            $params[':department_id'] = $currentUser->profile->department_id;
+            $filters[] = 'profile.department_id=:department_id';
+        }
+
+        if (isset($_GET['UserSearch'])) {
+            $userSearch = $_GET['UserSearch'];
+            if ($userSearch['profile.department.name'] != '') {
+                $params[':dep_name'] = '%' . $userSearch['profile.department.name'] . '%';
+                $filters[] = 'department.name LIKE :dep_name';
+            }
+        }
+
+        $filters = implode(' AND ', $filters);
+        if (strlen($filters) > 0) {
+            $filters = ' AND ' . $filters;
+        }
+
+        $q = "SELECT
+                profile.name as nev,
+                auth_assignment.item_name as jog,
+                department.name as szervezeti_egyseg
+              FROM
+                profile
+            INNER JOIN department ON (profile.department_id = department.id)
+            INNER JOIN auth_assignment ON ( profile.user_id = (auth_assignment.user_id+0) AND auth_assignment.item_name='dep_leader' )
+            where 1=1 {$filters}
+        ";
+
+        $vezetok = Yii::$app->db->createCommand($q, $params)->queryAll();
+        $aggregatedVezetok = [];
+        $currentVezeto = null;
+        $i = 0;
+        foreach ($vezetok as $row) {
+            $currentVezeto = [
+                'nev'                => $row['nev'],
+                'szervezeti_egyseg'  => $row['szervezeti_egyseg'],
+            ];
+            $i++;
+            $aggregatedVezetok[$i] = $currentVezeto;
+        }
+        return $aggregatedVezetok;
+    }
+*/
 }
